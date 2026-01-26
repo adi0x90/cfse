@@ -1,0 +1,211 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://cfse.dev/schemas/artifacts/trace.schema.yaml"
+title: "CFSE Trace Artifact Schema"
+description: |
+  Schema for Trace artifacts - structured evidence for temporal and
+  event-sequence claims.
+
+  A Trace is an ordered sequence of observed steps derived from logs,
+  audit trails, or controlled experiments (Explorations). Traces make
+  temporal operators (ALWAYS, EVENTUALLY, LEADS_TO) evaluable against
+  explicit evidence rather than implicit narrative.
+
+type: object
+
+required:
+  - id
+  - title
+  - exploration_ref
+  - path
+  - steps
+
+properties:
+  id:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/TraceID"
+    description: |
+      Unique identifier for this trace.
+
+  title:
+    type: string
+    minLength: 1
+    maxLength: 150
+    description: "Human-readable title for the trace."
+
+  description:
+    type: string
+    description: "Optional narrative context for the trace."
+
+  exploration_ref:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ExplorationID"
+    description: |
+      Exploration that produced or motivated this trace.
+
+  scenario_ref:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ScenarioID"
+    description: |
+      Optional scenario linkage (usually derivable from exploration_ref).
+
+  path:
+    type: string
+    enum: [BASELINE, ATTACK, OTHER]
+    description: |
+      Which exploration path (baseline vs attack) this trace corresponds to.
+
+  time_window:
+    $ref: "#/$defs/TimeWindow"
+    description: |
+      Optional time bounds of the underlying evidence slice.
+
+  sources:
+    type: array
+    items:
+      $ref: "#/$defs/TraceSource"
+    description: |
+      Source material used to construct the trace (logs, CloudTrail, SIEM, etc.).
+
+  correlation:
+    $ref: "#/$defs/Correlation"
+    description: |
+      Correlation keys used to group events into this trace (request_id, trace_id, etc.).
+
+  steps:
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/TraceStep"
+    description: |
+      Ordered steps of the trace. Each step represents a trace position ti.
+      Facts at a step may include events (actions) and state facts (predicates).
+
+  status:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    default: "DRAFT"
+    description: |
+      Lifecycle status of this trace artifact.
+
+  version:
+    type: string
+    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    description: "Semantic version of this trace."
+
+  extensions:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    description: |
+      Optional extension-specific fields. Extensions MUST be declared by the
+      corpus to be validated. See foundations/extensions.md.
+
+additionalProperties: false
+
+$defs:
+  TimeWindow:
+    title: "Time Window"
+    description: "Time bounds for the trace evidence."
+    type: object
+    properties:
+      start:
+        type: string
+        format: date-time
+        description: "Inclusive start time (RFC 3339)."
+      end:
+        type: string
+        format: date-time
+        description: "Exclusive end time (RFC 3339)."
+      timezone:
+        type: string
+        description: "Timezone reference if needed for human interpretation."
+    additionalProperties: false
+
+  TraceSource:
+    title: "Trace Source"
+    description: "Where the trace evidence comes from."
+    type: object
+    required:
+      - type
+    properties:
+      type:
+        type: string
+        enum:
+          - audit_log
+          - app_log
+          - cloudtrail
+          - siem
+          - packet_capture
+          - database
+          - manual
+          - other
+        description: "Source type."
+      ref:
+        type: string
+        description: "Pointer to the source (URL, file path, query, or ID)."
+      description:
+        type: string
+        description: "What this source contains and how it was collected."
+      integrity:
+        type: object
+        properties:
+          sha256:
+            type: string
+            pattern: "^[a-fA-F0-9]{64}$"
+            description: "SHA-256 of the raw source material, if available."
+        additionalProperties: false
+    additionalProperties: false
+
+  Correlation:
+    title: "Correlation"
+    description: "How events were grouped into a single ordered trace."
+    type: object
+    properties:
+      keys:
+        type: array
+        items:
+          type: string
+        description: "Correlation key names (request_id, trace_id, etc.)."
+      values:
+        type: object
+        additionalProperties: true
+        description: "Correlation key values used for this trace."
+      notes:
+        type: string
+        description: "Any assumptions used when correlating events."
+    additionalProperties: false
+
+  TraceStep:
+    title: "Trace Step"
+    description: "One position ti in the trace."
+    type: object
+    required:
+      - i
+    properties:
+      i:
+        type: integer
+        minimum: 0
+        description: "0-based step index."
+      at:
+        type: string
+        format: date-time
+        description: "Timestamp for the step if known."
+      events:
+        type: array
+        items:
+          type: string
+        description: |
+          Actions/events observed at this step. Recommended format is CFSE action
+          notation (e.g., READ(\"alice\", \"secret-123\")).
+      states:
+        type: array
+        items:
+          type: string
+        description: |
+          State facts/predicate evaluations at this step. Recommended format is a
+          predicate application string (e.g., P-AWS-IS-PUBLIC(\"bucket-1\")).
+      bindings:
+        type: object
+        additionalProperties:
+          type: string
+        description: |
+          Optional variable bindings used by the analysis at this step (e.g.,
+          principal -> \"alice\").
+      notes:
+        type: string
+        description: "Freeform notes for this step."
+    additionalProperties: false

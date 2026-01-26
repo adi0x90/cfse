@@ -1,0 +1,203 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://cfse.dev/schemas/artifacts/predicate.schema.yaml"
+title: "CFSE Predicate Artifact Schema"
+description: |
+  Schema for Predicate artifacts - atomic boolean conditions that form the
+  smallest building blocks of CFSE security logic. Predicates answer simple
+  yes/no questions about system state and are composed into invariants.
+
+type: object
+
+required:
+  - id
+  - name
+  - parameters
+  - returns
+  - definition
+
+properties:
+  id:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/PredicateID"
+    description: |
+      Unique identifier for the predicate following the pattern P-<SYSTEM>-<NAME>.
+      Example: P-SHOP-IS-OWNER, P-AWS-HAS-MFA, P-K8S-IS-PRIVILEGED
+
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+    description: |
+      Human-readable name for the predicate. Should clearly describe the
+      boolean condition being evaluated.
+    examples:
+      - "Is Resource Owner"
+      - "Has MFA Enabled"
+      - "Is Privileged Container"
+
+  parameters:
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/PredicateParameter"
+    description: |
+      Typed parameters that the predicate accepts. Each parameter represents
+      an input to the boolean evaluation. Parameters are positional and
+      referenced by name in the definition.
+
+  returns:
+    type: string
+    const: "boolean"
+    description: |
+      Return type of the predicate. Always 'boolean' - predicates must
+      evaluate to true or false. This field is required for documentation
+      and tooling purposes.
+
+  definition:
+    type: string
+    minLength: 10
+    maxLength: 1000
+    description: |
+      Plain English description of when this predicate evaluates to true.
+      The definition should be precise enough that developers can implement
+      the check and testers can verify the behavior.
+    examples:
+      - "True if user.id equals item.owner_id"
+      - "True if the IAM user has MFA device configured and active"
+      - "True if the container securityContext.privileged is set to true"
+
+  implementation:
+    $ref: "#/$defs/Implementation"
+    description: |
+      Optional implementation hints showing how the predicate maps to
+      actual code or queries. Useful for traceability between model and
+      implementation.
+
+  domain:
+    type: string
+    minLength: 1
+    maxLength: 50
+    description: |
+      Security domain this predicate belongs to. Helps organize predicates
+      by functional area.
+    examples:
+      - "authentication"
+      - "authorization"
+      - "ownership"
+      - "state"
+
+  used_in:
+    type: array
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+    uniqueItems: true
+    description: |
+      List of invariant IDs that use this predicate. Maintained for
+      reverse traceability - shows impact of predicate changes.
+
+  negation:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/PredicateID"
+    description: |
+      ID of the predicate that represents the logical negation. For example,
+      P-SHOP-IS-OWNER might have negation P-SHOP-NOT-OWNER. Not required
+      as NOT can be applied to any predicate.
+
+  related:
+    type: array
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/PredicateID"
+    uniqueItems: true
+    description: |
+      Related predicates that are often used together or address similar
+      concerns. Helps with discovery and completeness checking.
+
+  status:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    default: "DRAFT"
+    description: |
+      Lifecycle status of this predicate. Use DRAFT for work in progress,
+      ACTIVE for reviewed predicates, DEPRECATED for predicates being
+      phased out.
+
+  extensions:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    description: |
+      Optional extension-specific fields. Extensions MUST be declared by the
+      corpus to be validated. See foundations/extensions.md.
+
+additionalProperties: false
+
+$defs:
+  PredicateParameter:
+    title: "Predicate Parameter"
+    description: "A typed input parameter for predicate evaluation"
+    type: object
+    required:
+      - name
+      - type
+    properties:
+      name:
+        type: string
+        pattern: "^[a-z][a-z0-9_]*$"
+        description: "Parameter name in snake_case"
+      type:
+        oneOf:
+          - $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+          - $ref: "#/$defs/PrimitiveType"
+        description: |
+          Parameter type - either a Concept ID (C-*) or primitive type.
+          Using Concept IDs provides strong typing and enables validation.
+      description:
+        type: string
+        description: "Human-readable description of what this parameter represents"
+      constraints:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Constraint"
+        description: "Validation constraints for the parameter"
+    additionalProperties: false
+
+  PrimitiveType:
+    title: "Primitive Type"
+    description: "Basic data types for predicate parameters"
+    type: string
+    enum:
+      - string
+      - integer
+      - boolean
+      - uuid
+      - timestamp
+      - any
+    x-enum-descriptions:
+      string: "String value"
+      integer: "Integer number"
+      boolean: "Boolean true/false"
+      uuid: "UUID identifier"
+      timestamp: "Date/time value"
+      any: "Any type (use sparingly)"
+
+  Implementation:
+    title: "Implementation Hints"
+    description: "How the predicate maps to actual implementation"
+    type: object
+    properties:
+      language:
+        type: string
+        description: "Implementation language"
+        examples:
+          - "python"
+          - "typescript"
+          - "sql"
+          - "rego"
+      code:
+        type: string
+        description: "Code snippet showing the predicate evaluation"
+      query:
+        type: string
+        description: "Database or API query for the predicate"
+      file:
+        type: string
+        description: "File path where the predicate is implemented"
+      notes:
+        type: string
+        description: "Additional implementation notes"
+    additionalProperties: false

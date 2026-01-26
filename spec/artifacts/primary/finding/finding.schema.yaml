@@ -1,0 +1,439 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://cfse.dev/schemas/artifacts/finding.schema.yaml"
+title: "CFSE Finding Artifact Schema"
+description: |
+  Schema for Finding artifacts - confirmed vulnerabilities with evidence.
+  Findings are the final artifact of the CFSE workflow, documenting confirmed
+  vulnerabilities discovered through successful Explorations. They bridge
+  security research and remediation with actionable information.
+
+type: object
+
+required:
+  - id
+  - title
+  - severity
+  - description
+  - evidence
+  - violated_invariants
+  - remediation
+
+properties:
+  id:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/FindingID"
+    description: |
+      Unique identifier following pattern FD-<SYSTEM>-<CATEGORY>-<NNN>.
+      Example: FD-SHOP-AUTHZ-001, FD-AWS-CONFIG-023
+
+  title:
+    type: string
+    minLength: 1
+    maxLength: 100
+    description: |
+      Brief, descriptive title for the vulnerability.
+    examples:
+      - "Unauthorized File Deletion via IDOR"
+      - "Payment Bypass via Step Skip"
+      - "Privilege Escalation through Role Assumption"
+
+  severity:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Severity"
+    description: |
+      Severity level: CRITICAL, HIGH, MEDIUM, LOW, or INFO.
+      Based on impact assessment and exploitability.
+
+  category:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/FindingCategory"
+    description: |
+      Category classification: AUTHZ, AUTHN, CRYPTO, CONFIG, INJECT,
+      LEAK, LOGIC, RACE, SSRF, IDOR.
+
+  description:
+    type: string
+    minLength: 50
+    description: |
+      Detailed description of the vulnerability including what it is,
+      how it can be exploited, and what impact it has.
+
+  summary:
+    type: string
+    minLength: 20
+    maxLength: 500
+    description: |
+      One-paragraph executive summary for stakeholders.
+
+  evidence:
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/Evidence"
+    description: |
+      Concrete evidence proving the vulnerability exists. Links to
+      exploration results, logs, screenshots, or code references.
+
+  violated_invariants:
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/ViolatedInvariant"
+    uniqueItems: true
+    description: |
+      List of invariants that were proven to be violated.
+
+  impact:
+    $ref: "#/$defs/ImpactAssessment"
+    description: |
+      Detailed impact analysis covering CIA triad, financial,
+      and compliance implications.
+
+  affected_components:
+    $ref: "#/$defs/AffectedComponents"
+    description: |
+      CFSE artifacts affected: concepts, flows, interactions, and code.
+
+  root_cause:
+    $ref: "#/$defs/RootCause"
+    description: |
+      Analysis of why the vulnerability exists.
+
+  remediation:
+    $ref: "#/$defs/Remediation"
+    description: |
+      How to fix the vulnerability, including immediate patch
+      and systemic improvements.
+
+  traceability:
+    $ref: "#/$defs/Traceability"
+    description: |
+      Links back to CFSE artifacts: scenarios, explorations, invariants.
+
+  metadata:
+    $ref: "#/$defs/FindingMetadata"
+    description: |
+      Additional metadata: status, dates, discoverer, references.
+
+  status:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    default: "DRAFT"
+    description: |
+      Lifecycle status of this finding artifact.
+
+  version:
+    type: string
+    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    description: |
+      Semantic version of this finding.
+
+  extensions:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    description: |
+      Optional extension-specific fields. Extensions MUST be declared by the
+      corpus to be validated. See foundations/extensions.md.
+
+additionalProperties: false
+
+$defs:
+  Evidence:
+    title: "Evidence"
+    description: "Proof of vulnerability"
+    type: object
+    required:
+      - type
+      - description
+    properties:
+      type:
+        type: string
+        enum:
+          - exploration
+          - trace
+          - log
+          - screenshot
+          - request
+          - response
+          - code
+          - database
+          - configuration
+          - other
+        description: "Type of evidence"
+      description:
+        type: string
+        description: "Description of what this evidence shows"
+      reference:
+        type: string
+        description: "Reference to evidence source (ID, URL, path). For trace evidence, use a TraceID (T-*)."
+      data:
+        type: string
+        description: "Evidence data or content"
+      timestamp:
+        type: string
+        format: date-time
+        description: "When evidence was captured"
+    additionalProperties: false
+
+  ViolatedInvariant:
+    title: "Violated Invariant"
+    description: "An invariant that was proven violated"
+    type: object
+    required:
+      - invariant
+    properties:
+      invariant:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        description: "Invariant ID"
+      rule:
+        type: string
+        description: "Human-readable rule (from invariant definition)"
+      violation_details:
+        type: string
+        description: "How specifically this invariant was violated"
+      evidence_ref:
+        type: string
+        description: "Reference to specific evidence proving violation"
+    additionalProperties: false
+
+  ImpactAssessment:
+    title: "Impact Assessment"
+    description: "Detailed impact analysis"
+    type: object
+    properties:
+      confidentiality:
+        $ref: "#/$defs/ImpactRating"
+        description: "Impact on data confidentiality"
+      integrity:
+        $ref: "#/$defs/ImpactRating"
+        description: "Impact on data integrity"
+      availability:
+        $ref: "#/$defs/ImpactRating"
+        description: "Impact on system availability"
+      financial:
+        type: string
+        description: "Potential financial impact"
+      compliance:
+        type: array
+        items:
+          type: string
+        description: "Compliance frameworks affected (GDPR, SOC2, etc.)"
+      attack_scenario:
+        type: string
+        description: "Realistic attack scenario description"
+      affected_users:
+        type: string
+        description: "Scope of affected users"
+    additionalProperties: false
+
+  ImpactRating:
+    title: "Impact Rating"
+    description: "Rating for a specific impact dimension"
+    type: object
+    required:
+      - level
+    properties:
+      level:
+        type: string
+        enum:
+          - NONE
+          - LOW
+          - MEDIUM
+          - HIGH
+        description: "Impact level"
+      details:
+        type: string
+        description: "Details about this impact"
+    additionalProperties: false
+
+  AffectedComponents:
+    title: "Affected Components"
+    description: "CFSE artifacts and code affected"
+    type: object
+    properties:
+      concepts:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+        description: "Affected concepts"
+      flows:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/FlowID"
+        description: "Affected flows"
+      interactions:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+        description: "Affected interactions"
+      code:
+        type: array
+        items:
+          $ref: "#/$defs/CodeReference"
+        description: "Affected code locations"
+    additionalProperties: false
+
+  CodeReference:
+    title: "Code Reference"
+    description: "Reference to code location"
+    type: object
+    required:
+      - file
+    properties:
+      file:
+        type: string
+        description: "File path"
+      lines:
+        type: string
+        description: "Line range (e.g., '45-52')"
+      function:
+        type: string
+        description: "Function or method name"
+      description:
+        type: string
+        description: "What's wrong with this code"
+    additionalProperties: false
+
+  RootCause:
+    title: "Root Cause"
+    description: "Why the vulnerability exists"
+    type: object
+    required:
+      - summary
+    properties:
+      summary:
+        type: string
+        description: "Brief root cause summary"
+      vulnerable_code:
+        type: string
+        description: "Code snippet showing the vulnerability"
+      design_flaw:
+        type: string
+        description: "Design-level issue if applicable"
+      pattern:
+        type: string
+        description: "Vulnerability pattern name (e.g., 'IDOR', 'Missing AuthZ')"
+      cwe:
+        type: string
+        pattern: "^CWE-[0-9]+$"
+        description: "CWE identifier"
+    additionalProperties: false
+
+  Remediation:
+    title: "Remediation"
+    description: "How to fix the vulnerability"
+    type: object
+    required:
+      - summary
+    properties:
+      summary:
+        type: string
+        description: "Brief remediation summary"
+      immediate_fix:
+        $ref: "#/$defs/Fix"
+        description: "Quick patch to address the issue"
+      systemic_fix:
+        $ref: "#/$defs/Fix"
+        description: "Broader fix to prevent pattern recurrence"
+      testing:
+        type: array
+        items:
+          type: string
+        description: "Tests to add to prevent regression"
+      deployment:
+        type: array
+        items:
+          type: string
+        description: "Deployment steps for the fix"
+    additionalProperties: false
+
+  Fix:
+    title: "Fix"
+    description: "A specific fix"
+    type: object
+    required:
+      - description
+    properties:
+      description:
+        type: string
+        description: "What the fix does"
+      code_before:
+        type: string
+        description: "Code before fix"
+      code_after:
+        type: string
+        description: "Code after fix"
+      files:
+        type: array
+        items:
+          type: string
+        description: "Files to modify"
+    additionalProperties: false
+
+  Traceability:
+    title: "Traceability"
+    description: "Links to CFSE artifacts"
+    type: object
+    properties:
+      scenario:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ScenarioID"
+        description: "Scenario that hypothesized this vulnerability"
+      exploration:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ExplorationID"
+        description: "Exploration that confirmed the vulnerability"
+      trace_refs:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/TraceID"
+        uniqueItems: true
+        description: |
+          Optional trace evidence supporting ordering/temporal claims (baseline/attack traces, etc.).
+      related_findings:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/FindingID"
+        description: "Related findings (same pattern, etc.)"
+      patch:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/PatchID"
+        description: "Patch that fixes this finding"
+    additionalProperties: false
+
+  FindingMetadata:
+    title: "Finding Metadata"
+    description: "Additional finding metadata"
+    type: object
+    properties:
+      finding_status:
+        type: string
+        enum:
+          - OPEN
+          - IN_REMEDIATION
+          - PATCHED
+          - VERIFIED
+          - WONTFIX
+          - FALSE_POSITIVE
+        description: "Current status of the finding"
+      discovered:
+        type: string
+        format: date
+        description: "When the vulnerability was discovered"
+      discoverer:
+        type: string
+        description: "Who discovered the vulnerability"
+      verified:
+        type: string
+        format: date
+        description: "When the fix was verified"
+      verifier:
+        type: string
+        description: "Who verified the fix"
+      cvss_score:
+        type: number
+        minimum: 0
+        maximum: 10
+        description: "CVSS score if calculated"
+      cvss_vector:
+        type: string
+        description: "CVSS vector string"
+      references:
+        type: array
+        items:
+          type: string
+          format: uri
+        description: "External references (CVE, vendor advisories, etc.)"
+    additionalProperties: false

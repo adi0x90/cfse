@@ -1,0 +1,359 @@
+# CFSE Architecture Manifest
+# ====================
+# Machine-readable specification of the CFSE framework structure.
+# Designed for LLM consumption - provides explicit artifact relationships,
+# file locations, and cross-reference patterns.
+#
+# Version: 1.0.0
+# Last Updated: 2026-01-26
+
+cfse:
+  name: "Concept Flow Scenarios Explorations"
+  version: "1.0.0"
+  tagline: >
+    A formal methodology for security epistemology: replacing intuition with structure,
+    and claims with evidence.
+  description: >
+    A formal methodology for security epistemology—a disciplined approach to
+    *knowing* whether a system is secure, not guessing or hoping. CFSE builds
+    a world model through concepts, interactions, and flows; expresses security
+    properties as formal invariants with temporal logic (ALWAYS, EVENTUALLY,
+    LEADS_TO); and validates claims through systematic exploration backed by
+    structured Trace evidence.
+
+  normative_language:
+    rule: "RFC 2119 + RFC 8174 keywords are normative only when they appear in ALL CAPS."
+    keywords:
+      - "MUST"
+      - "MUST NOT"
+      - "SHOULD"
+      - "SHOULD NOT"
+      - "MAY"
+    references:
+      - "RFC 2119"
+      - "RFC 8174"
+
+  # ==========================================================================
+  # CORE WORKFLOW
+  # ==========================================================================
+  # The CFSE process follows a linear pipeline where each artifact type
+  # feeds into the next. Understanding this flow is essential.
+
+  workflow:
+    phases:
+      - id: foundation
+        name: "World Model Foundation"
+        description: "Establish the conceptual map of the system"
+        artifacts: [concepts]
+
+      - id: relationships
+        name: "Relationship Discovery"
+        description: "Map how concepts connect and interact"
+        artifacts: [interactions]
+        methodology: "CIA (Concept Interaction Analysis)"
+
+      - id: sequences
+        name: "Sequence Documentation"
+        description: "Document legitimate multi-step user journeys"
+        artifacts: [flows]
+
+      - id: hypothesis
+        name: "Security Hypothesis"
+        description: "Generate testable vulnerability theories"
+        artifacts: [scenarios]
+        uses: [generators]
+
+      - id: experimentation
+        name: "Experimental Validation"
+        description: "Execute concrete tests with BASE and ATT variants"
+        artifacts: [explorations]
+        methodology: "Delta Analysis"
+
+      - id: documentation
+        name: "Finding Documentation"
+        description: "Document confirmed vulnerabilities"
+        artifacts: [findings]
+
+      - id: remediation
+        name: "Patch & Learning"
+        description: "Fix, verify, and extract reusable patterns"
+        artifacts: [patches]
+        methodology: "4V Cycle (Verify, Validate, Vaccinate, Valuate)"
+
+  # ==========================================================================
+  # DIRECTORY STRUCTURE (v1.0.0)
+  # ==========================================================================
+  # The new structure uses spec/ (singular) as the normative source of truth.
+
+  directory_structure:
+    spec:
+      description: "Normative specification - source of truth"
+      classification: "normative"
+      organization: "Structured by concern (foundations, grammar, artifacts, semantics)"
+      contents:
+        foundations:
+          description: "Core framework concepts and definitions"
+          path: "spec/foundations/"
+          files:
+            - artifact-system.md
+            - conformance.md
+            - extensions.md
+
+        grammar:
+          description: "Syntax rules for IDs, references, and formal logic"
+          path: "spec/grammar/"
+          files:
+            - 01-id-syntax.md
+            - 02-reference-syntax.md
+            - 03-formal-logic.md
+            - 04-field-types.md
+          schemas:
+            - schemas/grammar.schema.yaml
+
+        artifacts:
+          description: "Artifact type definitions with YAML schemas"
+          path: "spec/artifacts/"
+          primary:
+            concept:
+              path: "spec/artifacts/primary/concept/"
+              files: [concept.md, concept.schema.yaml]
+              prefix: "C"
+            interaction:
+              path: "spec/artifacts/primary/interaction/"
+              files: [interaction.md, interaction.schema.yaml]
+              prefix: "I"
+            flow:
+              path: "spec/artifacts/primary/flow/"
+              files: [flow.md, flow.schema.yaml]
+              prefix: "F"
+            scenario:
+              path: "spec/artifacts/primary/scenario/"
+              files: [scenario.md, scenario.schema.yaml]
+              prefix: "S"
+            exploration:
+              path: "spec/artifacts/primary/exploration/"
+              files: [exploration.md, exploration.schema.yaml]
+              prefix: "E"
+            finding:
+              path: "spec/artifacts/primary/finding/"
+              files: [finding.md, finding.schema.yaml]
+              prefix: "FD"
+          supporting:
+            predicate:
+              path: "spec/artifacts/supporting/predicate/"
+              files: [predicate.md, predicate.schema.yaml]
+              prefix: "P"
+            invariant:
+              path: "spec/artifacts/supporting/invariant/"
+              files: [invariant.md, invariant.schema.yaml]
+              prefix: "INV"
+            generator:
+              path: "spec/artifacts/supporting/generator/"
+              files: [generator.md, generator.schema.yaml]
+              prefix: "GEN"
+            patch:
+              path: "spec/artifacts/supporting/patch/"
+              files: [patch.md, patch.schema.yaml]
+              prefix: "PATCH"
+
+        semantics:
+          description: "Behavioral rules and interpretation guidance"
+          path: "spec/semantics/"
+          files:
+            - 01-invariant-states.md
+            - 02-exploration-verdicts.md
+            - 03-artifact-lifecycle.md
+            - 04-traceability.md
+            - 05-delta-interpretation.md
+
+        root_files:
+          - spec/README.md
+          - spec/glossary.md
+          - spec/changelog.md
+
+    extensions:
+      description: "Optional extensions (opt-in; may be published separately)"
+      classification: "informative"
+      path: "extensions/"
+      files:
+        - README.md
+
+    guides:
+      description: "Background and reading guides"
+      classification: "informative"
+      path: "guides/"
+      contents:
+        foundations:
+          description: "High-level introduction and world model"
+          path: "guides/foundations/"
+          files:
+            - introduction.md
+            - world-model.md
+
+    rfcs:
+      description: "RFC / proposal process and templates"
+      classification: "informative"
+      path: "rfcs/"
+      files:
+        - README.md
+        - PROPOSALS.md
+
+  # ==========================================================================
+  # ARTIFACT PREFIXES
+  # ==========================================================================
+
+  artifact_prefixes:
+    C: concept
+    I: interaction
+    F: flow
+    S: scenario
+    E: exploration
+    FD: finding
+    P: predicate
+    INV: invariant
+    GEN: generator
+    PATCH: patch
+
+  # ==========================================================================
+  # ID PATTERNS
+  # ==========================================================================
+  # Consistent naming enables grep-based discovery and backlink analysis.
+
+  id_patterns:
+    concepts: "C-<SYSTEM>-<NAME>"
+    interactions: "I-<SYSTEM>-<VERB>-<NOUN>-###"
+    flows: "F-<SYSTEM>-<NAME>"
+    scenarios: "S-<SYSTEM>-<THEME>-###"
+    explorations: "E-<SYSTEM>-<THEME>-###-##"
+    findings: "FD-<SYSTEM>-<CAT>-###"
+    invariants: "INV-<SYSTEM>-<NAME>"
+    predicates: "P-<SYSTEM>-<NAME>"
+    generators: "GEN-<STRATEGY>-###"
+    patches: "PATCH-<SYSTEM>-###"
+
+  # ==========================================================================
+  # CROSS-REFERENCE SYNTAX
+  # ==========================================================================
+  # How artifacts link to each other in markdown documents.
+
+  reference_syntax:
+    inline_id: "`INV-AUTH-REQUIRED`"
+    cross_link: "[[I-USER-LOGIN-001]]"
+    file_link: "[Concept Specification](spec/artifacts/primary/concept/concept.md)"
+
+    contexts:
+      concept_invariants: "List INV- IDs only, never inline logic"
+      interaction_pre: "INV- IDs that must hold BEFORE the operation"
+      interaction_post: "INV- IDs that hold AFTER the operation"
+      flow_step_pre: "INV- IDs required before this step"
+      flow_step_post: "INV- IDs guaranteed after this step"
+      scenario_targeted: "INV- IDs under test (hypothesis)"
+      exploration_observations: "[[INV-]], [[I-]], [[S-]] with ENFORCED/VIOLATED status"
+      finding_violated: "INV- IDs confirmed violated"
+
+  # ==========================================================================
+  # CLASSIFICATION KEY
+  # ==========================================================================
+
+  classification_key:
+    normative: "Authoritative definitions - source of truth"
+    informative: "Guidance and examples - non-binding"
+    derivative: "Generated from normative sources"
+    sdk: "Integration tooling for tool-assisted automation (including AI)"
+
+  # ==========================================================================
+  # NAVIGATION QUICK REFERENCE
+  # ==========================================================================
+
+  navigation:
+    quick_start: "guides/foundations/introduction.md"
+    full_workflow: "spec/foundations/artifact-system.md"
+    specification_index: "spec/README.md"
+    artifact_index: "spec/foundations/artifact-system.md"
+    id_syntax: "spec/grammar/01-id-syntax.md"
+    glossary: "spec/glossary.md"
+
+  llm_navigation:
+    understand_cfse: "guides/foundations/introduction.md"
+    learn_world_model: "guides/foundations/world-model.md"
+    create_concept: "spec/artifacts/primary/concept/concept.md"
+    create_interaction: "spec/artifacts/primary/interaction/interaction.md"
+    create_flow: "spec/artifacts/primary/flow/flow.md"
+    create_scenario: "spec/artifacts/primary/scenario/scenario.md"
+    create_exploration: "spec/artifacts/primary/exploration/exploration.md"
+    create_finding: "spec/artifacts/primary/finding/finding.md"
+    define_invariants: "spec/artifacts/supporting/invariant_library/invariant_library.md"
+    understand_formal_logic: "spec/grammar/03-formal-logic.md"
+    generate_scenarios: "spec/artifacts/supporting/generator/generator.md"
+    complete_workflow: "spec/foundations/artifact-system.md"
+
+  # ==========================================================================
+  # COMMON PATTERNS & ANTI-PATTERNS
+  # ==========================================================================
+
+  patterns:
+    good:
+      - pattern: "Single source of truth for invariants"
+        description: "All invariants defined in central library, referenced by ID elsewhere"
+      - pattern: "Atomic interactions"
+        description: "Each interaction is a single operation; multi-step = flow"
+      - pattern: "Hypothesis before testing"
+        description: "Create scenario (hypothesis) before exploration (test)"
+      - pattern: "Delta Analysis isolation"
+        description: "BASE and ATT differ by exactly one variable"
+      - pattern: "Evidence-based findings"
+        description: "Every finding cites exploration evidence"
+
+    anti_patterns:
+      - pattern: "Inline invariant logic"
+        description: "Writing logic directly in concept/interaction docs instead of referencing INV- IDs"
+        fix: "Extract to invariant library, reference by ID"
+      - pattern: "Multi-step interactions"
+        description: "Documenting a sequence as a single interaction"
+        fix: "Split into flow with multiple interaction steps"
+      - pattern: "Untested scenarios"
+        description: "Scenarios without corresponding explorations"
+        fix: "Create exploration for each scenario before claiming findings"
+      - pattern: "Findings without evidence"
+        description: "Claiming vulnerabilities without exploration data"
+        fix: "Conduct exploration, document observations, then create finding"
+      - pattern: "Concept-as-role confusion"
+        description: "Creating concepts for user roles instead of system entities"
+        fix: "Roles are attributes or states of the User concept"
+
+  # ==========================================================================
+  # MIGRATION NOTES
+  # ==========================================================================
+
+  migration:
+    from_version: "pre-1.0"
+    to_version: "1.0.0"
+    date: "2026-01-25"
+    changes:
+      - "Consolidated numbered directories (1-framework, 2-concepts, etc.) into spec/"
+      - "Introduced foundations/, grammar/, artifacts/, semantics/ structure"
+      - "Added YAML schemas for all artifact types"
+      - "Separated normative spec from informative materials (published separately)"
+      - "Created machine-readable ARCHITECTURE.yml manifest"
+
+  # ==========================================================================
+  # VERSION HISTORY
+  # ==========================================================================
+
+  version_history:
+    - version: "1.0.0"
+      date: "2026-01-25"
+      changes:
+        - "First public release of CFSE specification"
+        - "New spec/ directory with organized subdirectories"
+        - "YAML schemas for all artifacts"
+        - "Separated normative spec from informative materials (published separately)"
+        - "Updated ARCHITECTURE.yml for v1.0.0"
+    - version: "0.1.0"
+      date: "2025-11-15"
+      changes:
+        - "Initial ARCHITECTURE.yml creation"
+        - "Documented all artifact types with specs and templates"
+        - "Added LLM navigation quick reference"
+        - "Defined cross-reference syntax"
+        - "Added patterns and anti-patterns"

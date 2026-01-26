@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: "CFSE Specification"
+message: "If you use CFSE in research or practice, please cite this specification."
+type: software
+authors:
+  - given-names: "Aditya"
+    family-names: "Gupta"
+version: "1.0.0"
+date-released: "2026-01-25"
+license: "Apache-2.0"

@@ -1,0 +1,110 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://cfse.dev/schemas/artifacts/prj.schema.yaml"
+title: "CFSE Projection (PRJ) Artifact Schema"
+description: "Schema for PRJ-* artifacts (viewer-context projections across surfaces)"
+
+type: object
+
+required:
+  - id
+  - title
+  - viewer_context
+  - surfaces
+
+properties:
+  id:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ProjectionID"
+    description: "Unique identifier for this PRJ artifact"
+
+  title:
+    type: string
+    minLength: 1
+    maxLength: 120
+    description: "Human-readable name"
+
+  viewer_context:
+    type: object
+    description: "Viewer context definition (label + reference based; no executable logic)"
+    additionalProperties: true
+
+  surfaces:
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/SurfaceRef"
+    description: "Surfaces included in this projection"
+
+  assumptions:
+    type: object
+    properties:
+      predicates:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/PredicateID"
+      invariants:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+    additionalProperties: false
+    description: "Traceability references used to define the projection context"
+
+  visible:
+    type: array
+    items:
+      $ref: "#/$defs/Exposure"
+    description: "Optional explicit listing of what is visible for this viewer context"
+
+  notes:
+    type: string
+
+  status:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    default: "DRAFT"
+
+  version:
+    type: string
+    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+
+  extensions:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+
+additionalProperties: false
+
+$defs:
+  SurfaceRef:
+    type: object
+    required:
+      - ref
+    properties:
+      ref:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/EntryPointID"
+        description: "Reference to an entry point (EP-*)"
+      notes:
+        type: string
+    additionalProperties: false
+
+  ExposureMode:
+    type: string
+    enum:
+      - DISCLOSE
+      - DERIVE
+      - LINK
+      - METADATA
+
+  Exposure:
+    type: object
+    required:
+      - ref
+      - exposure_mode
+    properties:
+      ref:
+        type: string
+      exposure_mode:
+        $ref: "#/$defs/ExposureMode"
+      governed_by_invariants:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+      notes:
+        type: string
+    additionalProperties: false

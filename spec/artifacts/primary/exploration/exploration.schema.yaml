@@ -1,0 +1,619 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://cfse.dev/schemas/artifacts/exploration.schema.yaml"
+title: "CFSE Exploration Artifact Schema"
+description: |
+  Schema for Exploration artifacts - concrete security experiments.
+  Explorations are reproducible experiments that execute a Scenario with
+  precise steps, inputs, and observations. Every Exploration includes both
+  a Baseline (legitimate path) and Attack path (manipulation) to enable
+  Delta Analysis for comparing enforcement vs. violation.
+
+type: object
+
+required:
+  - id
+  - title
+  - scenario_ref
+  - objective
+  - base_setup
+  - base_action
+  - base_expected
+  - att_setup
+  - att_action
+  - att_expected
+  - observations
+  - verdict
+
+properties:
+  id:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ExplorationID"
+    description: |
+      Unique identifier following pattern E-<SYSTEM>-<NAME>-<NNN>-<VV>.
+      The final segment versions the exploration for the same scenario.
+      Example: E-SHOP-IDOR-DELETE-001-01, E-AWS-ESCALATION-003-05
+
+  title:
+    type: string
+    minLength: 1
+    maxLength: 150
+    description: |
+      Descriptive name of the experiment.
+    examples:
+      - "IDOR Delete Attack: Bob Deletes Alice's Item"
+      - "Payment Bypass: Skip Checkout Step 3"
+
+  scenario_ref:
+    oneOf:
+      - $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ScenarioID"
+      - type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ScenarioID"
+        minItems: 1
+    description: |
+      Reference to the Scenario(s) being tested. Usually a single scenario,
+      but may reference multiple related scenarios.
+
+  objective:
+    type: string
+    minLength: 10
+    maxLength: 500
+    description: |
+      What the experiment aims to confirm or refute. Should reference
+      the targeted invariants.
+    examples:
+      - "Confirm whether INV-SHOP-OWNER-DELETE is enforced when Bob attempts to delete Alice's item"
+      - "Test if skipping payment step violates INV-SHOP-ORDER-PAYMENT-REQUIRED"
+
+  setup:
+    $ref: "#/$defs/ExplorationSetup"
+    description: |
+      Shared setup for both baseline and attack paths. Includes environment,
+      preconditions, fixtures, and role/parameter bindings.
+
+  base_setup:
+    $ref: "#/$defs/PathSetup"
+    description: |
+      Setup specific to the baseline (legitimate) path. Establishes the
+      happy path context.
+
+  base_action:
+    $ref: "#/$defs/PathAction"
+    description: |
+      Steps executed in the baseline path. These represent legitimate
+      behavior that should succeed and enforce invariants.
+
+  base_expected:
+    $ref: "#/$defs/PathExpected"
+    description: |
+      Expected observations for the baseline path. Documents what should
+      happen when invariants are properly enforced.
+
+  att_setup:
+    $ref: "#/$defs/PathSetup"
+    description: |
+      Setup specific to the attack path. Establishes the attacker's context.
+
+  att_action:
+    $ref: "#/$defs/PathAction"
+    description: |
+      Steps executed in the attack path. These represent the manipulated
+      behavior attempting to violate invariants.
+
+  att_expected:
+    $ref: "#/$defs/PathExpected"
+    description: |
+      Expected observations for the attack path. Documents what should
+      happen if the system is secure (enforcement) or vulnerable (violation).
+
+  observations:
+    $ref: "#/$defs/Observations"
+    description: |
+      Actual observations from executing the exploration. Filled after
+      running the experiment.
+
+  trace_refs:
+    $ref: "#/$defs/TraceRefs"
+    description: |
+      Optional references to structured Trace artifacts that capture ordered
+      evidence (events/state facts) for the baseline and/or attack paths.
+      Recommended when evaluating temporal operators (ALWAYS, EVENTUALLY, LEADS_TO).
+
+  verdict:
+    $ref: "#/$defs/ExplorationVerdict"
+    description: |
+      Final determination: was the invariant violated (vulnerable),
+      enforced (secure), or could not be determined (inconclusive)?
+
+  acceptance_criteria:
+    $ref: "#/$defs/AcceptanceCriteria"
+    description: |
+      Pass/fail definitions linked to invariants.
+
+  cleanup:
+    $ref: "#/$defs/Cleanup"
+    description: |
+      Optional teardown instructions to reset state after exploration.
+
+  status:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    default: "DRAFT"
+    description: |
+      Lifecycle status of this exploration artifact.
+
+  version:
+    type: string
+    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    description: |
+      Semantic version of this exploration definition.
+
+  extensions:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    description: |
+      Optional extension-specific fields. Extensions MUST be declared by the
+      corpus to be validated. See foundations/extensions.md.
+
+additionalProperties: false
+
+$defs:
+  ExplorationSetup:
+    title: "Exploration Setup"
+    description: "Shared setup for baseline and attack paths"
+    type: object
+    properties:
+      env:
+        type: object
+        additionalProperties:
+          type: string
+        description: "Environment variables (e.g., BASE=http://localhost:3000)"
+      preconditions:
+        type: array
+        items:
+          type: string
+        description: "Required preconditions before execution"
+      fixtures:
+        type: array
+        items:
+          $ref: "#/$defs/Fixture"
+        description: "Test data and fixtures to create"
+      bindings:
+        type: array
+        items:
+          $ref: "#/$defs/RoleBinding"
+        description: "Role and parameter bindings"
+    additionalProperties: false
+
+  PathSetup:
+    title: "Path Setup"
+    description: "Setup for a specific path (baseline or attack)"
+    type: object
+    required:
+      - description
+    properties:
+      description:
+        type: string
+        description: "Description of this path's setup"
+      actor:
+        type: string
+        description: "Who is executing this path"
+      context:
+        type: string
+        description: "Additional context for this path"
+      prerequisites:
+        type: array
+        items:
+          type: string
+        description: "Steps required before this path"
+    additionalProperties: false
+
+  PathAction:
+    title: "Path Action"
+    description: "Steps executed in a path"
+    type: object
+    required:
+      - steps
+    properties:
+      goal:
+        type: string
+        description: "What this action sequence achieves"
+      steps:
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/ActionStep"
+        description: "Ordered steps to execute"
+    additionalProperties: false
+
+  ActionStep:
+    title: "Action Step"
+    description: "A single step in the action sequence"
+    type: object
+    required:
+      - order
+      - description
+    properties:
+      order:
+        type: integer
+        minimum: 1
+        description: "Step sequence number"
+      description:
+        type: string
+        description: "What this step does"
+      interaction:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+        description: "Referenced interaction"
+      command:
+        type: string
+        description: "Actual command to execute (curl, etc.)"
+      request:
+        $ref: "#/$defs/HttpRequest"
+        description: "HTTP request details"
+      extract:
+        type: array
+        items:
+          $ref: "#/$defs/Extraction"
+        description: "Values to extract from response"
+      notes:
+        type: string
+        description: "Additional notes"
+    additionalProperties: false
+
+  HttpRequest:
+    title: "HTTP Request"
+    description: "Structured HTTP request"
+    type: object
+    required:
+      - method
+      - path
+    properties:
+      method:
+        type: string
+        enum:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+        description: "HTTP method"
+      path:
+        type: string
+        description: "Request path (can include variables like ${item_id})"
+      headers:
+        type: object
+        additionalProperties:
+          type: string
+        description: "Request headers"
+      body:
+        description: "Request body (object or string)"
+      content_type:
+        type: string
+        description: "Content-Type header"
+    additionalProperties: false
+
+  Extraction:
+    title: "Extraction"
+    description: "Value to extract from response"
+    type: object
+    required:
+      - name
+      - path
+    properties:
+      name:
+        type: string
+        description: "Variable name to store extracted value"
+      path:
+        type: string
+        description: "JSONPath or jq expression to extract value"
+      description:
+        type: string
+        description: "What this value represents"
+    additionalProperties: false
+
+  PathExpected:
+    title: "Path Expected"
+    description: "Expected observations for a path"
+    type: object
+    required:
+      - outcome
+    properties:
+      outcome:
+        type: string
+        description: "Expected outcome description"
+      status_code:
+        type: integer
+        description: "Expected HTTP status code"
+      response_contains:
+        type: array
+        items:
+          type: string
+        description: "Expected response content patterns"
+      invariants:
+        type: array
+        items:
+          $ref: "#/$defs/InvariantExpectation"
+        description: "Expected invariant states"
+      state_changes:
+        type: array
+        items:
+          type: string
+        description: "Expected state changes"
+    additionalProperties: false
+
+  InvariantExpectation:
+    title: "Invariant Expectation"
+    description: "Expected state of an invariant"
+    type: object
+    required:
+      - invariant
+      - expected_state
+    properties:
+      invariant:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        description: "Invariant ID"
+      expected_state:
+        type: string
+        enum:
+          - HOLDS
+          - VIOLATED
+        description: "Expected state"
+      notes:
+        type: string
+        description: "Why we expect this state"
+    additionalProperties: false
+
+  Observations:
+    title: "Observations"
+    description: "Actual observations from execution"
+    type: object
+    properties:
+      executed_at:
+        type: string
+        format: date-time
+        description: "When the exploration was executed"
+      environment:
+        type: string
+        description: "Execution environment"
+      base_results:
+        $ref: "#/$defs/PathResults"
+        description: "Results from baseline execution"
+      att_results:
+        $ref: "#/$defs/PathResults"
+        description: "Results from attack execution"
+      delta:
+        $ref: "#/$defs/DeltaAnalysis"
+        description: "Comparison between baseline and attack"
+    additionalProperties: false
+
+  PathResults:
+    title: "Path Results"
+    description: "Results from executing a path"
+    type: object
+    properties:
+      success:
+        type: boolean
+        description: "Whether the path executed successfully"
+      status_code:
+        type: integer
+        description: "HTTP status code received"
+      response_body:
+        type: string
+        description: "Response body (truncated if large)"
+      state_after:
+        type: object
+        additionalProperties: true
+        description: "Relevant state after execution"
+      logs:
+        type: array
+        items:
+          type: string
+        description: "Relevant log entries"
+      errors:
+        type: array
+        items:
+          type: string
+        description: "Errors encountered"
+    additionalProperties: false
+
+  DeltaAnalysis:
+    title: "Delta Analysis"
+    description: "Comparison between baseline and attack paths"
+    type: object
+    required:
+      - summary
+    properties:
+      summary:
+        type: string
+        description: "High-level summary of the delta"
+      differences:
+        type: array
+        items:
+          $ref: "#/$defs/Difference"
+        description: "Specific differences observed"
+      invariant_states:
+        type: array
+        items:
+          $ref: "#/$defs/InvariantResult"
+        description: "Observed invariant states"
+    additionalProperties: false
+
+  Difference:
+    title: "Difference"
+    description: "A specific difference between paths"
+    type: object
+    required:
+      - aspect
+      - baseline
+      - attack
+    properties:
+      aspect:
+        type: string
+        description: "What aspect differs"
+      baseline:
+        type: string
+        description: "Baseline value/behavior"
+      attack:
+        type: string
+        description: "Attack value/behavior"
+      significance:
+        type: string
+        description: "Why this difference matters"
+    additionalProperties: false
+
+  InvariantResult:
+    title: "Invariant Result"
+    description: "Observed state of an invariant"
+    type: object
+    required:
+      - invariant
+      - state
+    properties:
+      invariant:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        description: "Invariant ID"
+      state:
+        type: string
+        enum:
+          - HOLDS
+          - VIOLATED
+          - UNKNOWN
+          - NOT_APPLICABLE
+        description: "Observed state"
+      evidence:
+        type: string
+        description: "Evidence for this determination"
+    additionalProperties: false
+
+  ExplorationVerdict:
+    title: "Exploration Verdict"
+    description: "Final determination of the exploration"
+    type: object
+    required:
+      - result
+      - summary
+    properties:
+      result:
+        type: string
+        enum:
+          - VIOLATION_CONFIRMED
+          - ENFORCEMENT_CONFIRMED
+          - INCONCLUSIVE
+          - BLOCKED
+        description: "Overall result"
+      summary:
+        type: string
+        description: "Summary of findings"
+      confidence:
+        type: string
+        enum:
+          - HIGH
+          - MEDIUM
+          - LOW
+        description: "Confidence level in verdict"
+      finding_ref:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/FindingID"
+        description: "Finding ID if violation confirmed"
+      recommendations:
+        type: array
+        items:
+          type: string
+        description: "Recommended next steps"
+    additionalProperties: false
+
+  AcceptanceCriteria:
+    title: "Acceptance Criteria"
+    description: "Pass/fail definitions"
+    type: object
+    properties:
+      pass:
+        type: array
+        items:
+          type: string
+        description: "Conditions for passing (violation confirmed)"
+      fail:
+        type: array
+        items:
+          type: string
+        description: "Conditions for failing (enforcement confirmed)"
+    additionalProperties: false
+
+  Cleanup:
+    title: "Cleanup"
+    description: "Teardown instructions"
+    type: object
+    properties:
+      description:
+        type: string
+        description: "What needs to be cleaned up"
+      steps:
+        type: array
+        items:
+          type: string
+        description: "Cleanup steps (commands or descriptions)"
+      automated:
+        type: boolean
+        description: "Whether cleanup is automated"
+    additionalProperties: false
+
+  TraceRefs:
+    title: "Trace References"
+    description: "Links to Trace artifacts produced during exploration execution"
+    type: object
+    properties:
+      baseline:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/TraceID"
+        description: "Trace for the baseline (legitimate) path"
+      attack:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/TraceID"
+        description: "Trace for the attack (manipulated) path"
+      additional:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/TraceID"
+        uniqueItems: true
+        description: "Any additional traces (retries, alternate windows, etc.)"
+    additionalProperties: false
+
+  Fixture:
+    title: "Fixture"
+    description: "Test data fixture"
+    type: object
+    required:
+      - name
+      - type
+    properties:
+      name:
+        type: string
+        description: "Fixture name for reference"
+      type:
+        type: string
+        description: "Type of fixture (user, item, order, etc.)"
+      data:
+        type: object
+        additionalProperties: true
+        description: "Fixture data"
+      created_by:
+        type: string
+        description: "How fixture is created (API, seed, manual)"
+    additionalProperties: false
+
+  RoleBinding:
+    title: "Role Binding"
+    description: "Role and parameter binding"
+    type: object
+    required:
+      - role
+    properties:
+      role:
+        type: string
+        description: "Role name (e.g., owner, attacker, admin)"
+      user:
+        type: string
+        description: "User fixture or identifier"
+      token:
+        type: string
+        description: "Auth token variable"
+      parameters:
+        type: object
+        additionalProperties:
+          type: string
+        description: "Additional parameter bindings"
+    additionalProperties: false

@@ -1,0 +1,360 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://cfse.dev/schemas/artifacts/generator.schema.yaml"
+title: "CFSE Generator Artifact Schema"
+description: |
+  Schema for Generator artifacts - reusable patterns for creating scenarios.
+  Generators encode testing strategies as templates that can be instantiated
+  across different concepts, interactions, and invariants.
+
+type: object
+
+required:
+  - id
+  - name
+  - strategy
+  - template
+  - variables
+
+properties:
+  id:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/GeneratorID"
+    description: |
+      Unique identifier for the generator following the pattern GEN-<STRATEGY>-<NNN>.
+      Example: GEN-BOUNDARY-001, GEN-MUTATION-FUZZ-042, GEN-IDOR-003
+
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+    description: |
+      Human-readable name for the generator. Should describe the testing
+      strategy or pattern being encoded.
+    examples:
+      - "Boundary Value Testing"
+      - "Parameter Mutation Fuzzer"
+      - "IDOR Horizontal Privilege Check"
+
+  strategy:
+    $ref: "#/$defs/GeneratorStrategy"
+    description: |
+      The testing strategy this generator implements. Strategies define
+      the approach to scenario generation.
+
+  template:
+    $ref: "#/$defs/ScenarioTemplate"
+    description: |
+      Template for generating scenarios. Contains placeholders that are
+      substituted with variable values during instantiation.
+
+  variables:
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/TemplateVariable"
+    description: |
+      Variables that must be provided when instantiating the generator.
+      Each variable defines a placeholder in the template.
+
+  description:
+    type: string
+    minLength: 10
+    maxLength: 1000
+    description: |
+      Detailed description of what this generator produces and when to use it.
+      Should explain the security testing rationale.
+
+  applicable_to:
+    $ref: "#/$defs/ApplicabilityConstraints"
+    description: |
+      Constraints on when this generator can be applied. Specifies which
+      concepts, interactions, or invariant types are valid targets.
+
+  outputs:
+    type: array
+    items:
+      type: string
+      enum:
+        - scenario
+        - exploration
+        - test_case
+    default:
+      - scenario
+    description: |
+      Types of artifacts this generator produces. Most generators produce
+      scenarios, but some may generate explorations or test cases directly.
+
+  examples:
+    type: array
+    items:
+      $ref: "#/$defs/GeneratorExample"
+    description: |
+      Example instantiations showing how the generator produces scenarios.
+      Helps users understand how to apply the generator.
+
+  related:
+    type: array
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/GeneratorID"
+    uniqueItems: true
+    description: |
+      Related generators that address similar concerns or can be used
+      together for comprehensive testing.
+
+  status:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    default: "DRAFT"
+    description: |
+      Lifecycle status of this generator. Use DRAFT for work in progress,
+      ACTIVE for reviewed generators, DEPRECATED for generators being
+      phased out.
+
+  extensions:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    description: |
+      Optional extension-specific fields. Extensions MUST be declared by the
+      corpus to be validated. See foundations/extensions.md.
+
+additionalProperties: false
+
+$defs:
+  GeneratorStrategy:
+    title: "Generator Strategy"
+    description: "The testing approach implemented by the generator"
+    type: string
+    enum:
+      - boundary
+      - mutation
+      - idor
+      - privilege_escalation
+      - state_transition
+      - race_condition
+      - injection
+      - bypass
+      - denial
+      - confusion
+      - replay
+      - forgery
+    x-enum-descriptions:
+      boundary: "Tests boundary conditions and edge cases"
+      mutation: "Mutates valid inputs to find weaknesses"
+      idor: "Tests for insecure direct object references"
+      privilege_escalation: "Tests for privilege escalation paths"
+      state_transition: "Tests invalid state transitions"
+      race_condition: "Tests for race conditions and TOCTOU issues"
+      injection: "Tests for injection vulnerabilities"
+      bypass: "Tests for control bypass scenarios"
+      denial: "Tests for denial of service conditions"
+      confusion: "Tests for type confusion and similar issues"
+      replay: "Tests for replay attack vulnerabilities"
+      forgery: "Tests for request/response forgery"
+
+  ScenarioTemplate:
+    title: "Scenario Template"
+    description: "Template structure for generating scenarios"
+    type: object
+    required:
+      - title_pattern
+      - hypothesis_pattern
+      - setup
+      - steps
+    properties:
+      title_pattern:
+        type: string
+        description: |
+          Pattern for scenario title with {{variable}} placeholders.
+          Example: "{{action}} on {{concept}} by unauthorized user"
+      hypothesis_pattern:
+        type: string
+        description: |
+          Pattern for scenario hypothesis with {{variable}} placeholders.
+          Describes the security assumption being tested.
+      preconditions:
+        type: array
+        items:
+          type: string
+        description: |
+          Required preconditions with {{variable}} placeholders.
+      setup:
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/TemplateStep"
+        description: |
+          Setup steps to establish the test context.
+      steps:
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/TemplateStep"
+        description: |
+          Execution steps that test the hypothesis.
+      expected_result:
+        type: string
+        description: |
+          Expected outcome pattern with {{variable}} placeholders.
+      invariants:
+        type: array
+        items:
+          type: string
+        description: |
+          Invariant ID patterns or literal IDs to associate with scenarios.
+    additionalProperties: false
+
+  TemplateStep:
+    title: "Template Step"
+    description: "A step in the scenario template with placeholders"
+    type: object
+    required:
+      - action
+    properties:
+      action:
+        type: string
+        description: "Action description with {{variable}} placeholders"
+      actor:
+        type: string
+        description: "Actor performing the action (can be a {{variable}})"
+      target:
+        type: string
+        description: "Target of the action (can be a {{variable}})"
+      parameters:
+        type: object
+        additionalProperties: true
+        description: "Parameters for the action with potential {{variable}} placeholders"
+      expected:
+        type: string
+        description: "Expected result of this step"
+      notes:
+        type: string
+        description: "Additional notes for execution"
+    additionalProperties: false
+
+  TemplateVariable:
+    title: "Template Variable"
+    description: "A variable that must be provided for instantiation"
+    type: object
+    required:
+      - name
+      - type
+      - description
+    properties:
+      name:
+        type: string
+        pattern: "^[a-z][a-z0-9_]*$"
+        description: "Variable name used in {{name}} placeholders"
+      type:
+        $ref: "#/$defs/VariableType"
+        description: "Type constraint for the variable value"
+      description:
+        type: string
+        description: "What this variable represents"
+      required:
+        type: boolean
+        default: true
+        description: "Whether this variable must be provided"
+      default:
+        description: "Default value if not provided"
+      examples:
+        type: array
+        items:
+          type: string
+        description: "Example values for this variable"
+      constraints:
+        type: array
+        items:
+          type: string
+        description: "Additional constraints on valid values"
+    additionalProperties: false
+
+  VariableType:
+    title: "Variable Type"
+    description: "Type classification for template variables"
+    type: string
+    enum:
+      - concept_id
+      - interaction_id
+      - invariant_id
+      - predicate_id
+      - action
+      - actor
+      - string
+      - integer
+      - enum
+      - list
+    x-enum-descriptions:
+      concept_id: "A CFSE Concept ID (C-*)"
+      interaction_id: "A CFSE Interaction ID (I-*)"
+      invariant_id: "A CFSE Invariant ID (INV-*)"
+      predicate_id: "A CFSE Predicate ID (P-*)"
+      action: "A CRUD action type"
+      actor: "An actor/principal description"
+      string: "Free-form string value"
+      integer: "Numeric value"
+      enum: "One of a predefined set of values"
+      list: "A list of values"
+
+  ApplicabilityConstraints:
+    title: "Applicability Constraints"
+    description: "Constraints on when the generator can be applied"
+    type: object
+    properties:
+      concepts:
+        type: array
+        items:
+          type: string
+        description: |
+          Concept ID patterns this generator applies to.
+          Use wildcards: "C-SHOP-*", "C-AWS-*"
+      interactions:
+        type: array
+        items:
+          type: string
+        description: |
+          Interaction ID patterns this generator applies to.
+      invariant_tags:
+        type: array
+        items:
+          type: string
+        description: |
+          Invariant tags that must be present for applicability.
+          Example: ["authz", "ownership"]
+      requires_state:
+        type: boolean
+        default: false
+        description: |
+          Whether the target concept must have a state machine.
+      requires_relationships:
+        type: boolean
+        default: false
+        description: |
+          Whether the target concept must have relationships defined.
+      excluded_concepts:
+        type: array
+        items:
+          type: string
+        description: |
+          Concept ID patterns to exclude from generation.
+    additionalProperties: false
+
+  GeneratorExample:
+    title: "Generator Example"
+    description: "An example instantiation of the generator"
+    type: object
+    required:
+      - name
+      - variables
+      - produces
+    properties:
+      name:
+        type: string
+        description: "Name of this example"
+      variables:
+        type: object
+        additionalProperties: true
+        description: "Variable values for this instantiation"
+      produces:
+        type: string
+        description: "Description or ID of the produced scenario"
+      notes:
+        type: string
+        description: "Additional notes about this example"
+    additionalProperties: false

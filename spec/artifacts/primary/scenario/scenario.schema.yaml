@@ -1,0 +1,392 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://cfse.dev/schemas/artifacts/scenario.schema.yaml"
+title: "CFSE Scenario Artifact Schema"
+description: |
+  Schema for Scenario artifacts - testable vulnerability hypotheses.
+  Scenarios formulate precise "what-if" hypotheses about invariant violations
+  by manipulating interactions, flow steps, inputs, or states. They connect
+  a hypothesis to concrete targets and define acceptance criteria for testing.
+
+type: object
+
+required:
+  - id
+  - title
+  - hypothesis
+  - targeted_invariants
+  - attack_vector
+  - expected_outcome
+
+properties:
+  id:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ScenarioID"
+    description: |
+      Unique identifier for the scenario following pattern S-<SYSTEM>-<NAME>-<NNN>.
+      Example: S-SHOP-IDOR-DELETE-001, S-AWS-PRIVILEGE-ESCALATION-003
+
+  title:
+    type: string
+    minLength: 1
+    maxLength: 100
+    description: |
+      Concise title describing the attack hypothesis.
+    examples:
+      - "IDOR: Delete Other User's Items"
+      - "Privilege Escalation via Role Assumption"
+      - "Payment Bypass via Step Skip"
+
+  question:
+    type: string
+    minLength: 10
+    maxLength: 500
+    description: |
+      Natural language question this scenario answers. Helps frame the
+      hypothesis as a testable inquiry.
+    examples:
+      - "Can User A delete items owned by User B?"
+      - "Can a user skip payment and still receive goods?"
+      - "Can an attacker assume admin role without proper credentials?"
+
+  premise:
+    type: string
+    minLength: 10
+    maxLength: 500
+    description: |
+      Setup assumptions and context for the scenario. What conditions
+      exist before the attack is attempted?
+    examples:
+      - "Two users exist: Alice (owner of items) and Bob (attacker)"
+      - "User has completed checkout but payment is pending"
+
+  hypothesis:
+    type: string
+    minLength: 10
+    maxLength: 1000
+    description: |
+      The suspected vulnerability being tested. Must reference specific
+      invariants (INV-*) that may be violated.
+    examples:
+      - "The owner check (INV-SHOP-OWNER-DELETE) can be bypassed by directly calling DELETE /items/{id} with another user's item ID"
+      - "Skipping step 3 (payment) in F-SHOP-CHECKOUT allows order completion, violating INV-SHOP-ORDER-PAYMENT-REQUIRED"
+
+  targeted_invariants:
+    type: array
+    minItems: 1
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+    uniqueItems: true
+    description: |
+      List of invariant IDs (INV-*) that this scenario attempts to violate.
+      The primary oracle for determining success/failure of the attack.
+
+  targeted_concepts:
+    type: array
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+    uniqueItems: true
+    description: |
+      Concepts involved in this scenario.
+
+  targeted_interactions:
+    type: array
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+    uniqueItems: true
+    description: |
+      Specific interactions being manipulated or targeted.
+
+  targeted_flows:
+    type: array
+    items:
+      $ref: "#/$defs/FlowTarget"
+    description: |
+      Flows being manipulated, with specific step references where applicable.
+
+  attack_vector:
+    $ref: "#/$defs/AttackVector"
+    description: |
+      How the attack is executed - the method and manipulation details.
+
+  expected_outcome:
+    $ref: "#/$defs/ExpectedOutcome"
+    description: |
+      What results indicate success (violation) or failure (enforcement)
+      of the attack hypothesis.
+
+  acceptance_criteria:
+    $ref: "#/$defs/AcceptanceCriteria"
+    description: |
+      Precise criteria for validating or refuting the hypothesis.
+
+  generator:
+    $ref: "#/$defs/GeneratorRef"
+    description: |
+      If this scenario was produced by a generator, reference it here.
+
+  observability:
+    $ref: "#/$defs/ScenarioObservability"
+    description: |
+      Add only after live validation. Documents concrete evidence from testing.
+
+  notes:
+    type: string
+    description: |
+      Additional context, references, or considerations.
+
+  status:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    default: "DRAFT"
+    description: |
+      Lifecycle status of this scenario artifact.
+
+  version:
+    type: string
+    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    description: |
+      Semantic version of this scenario definition.
+
+  extensions:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    description: |
+      Optional extension-specific fields. Extensions MUST be declared by the
+      corpus to be validated. See foundations/extensions.md.
+
+additionalProperties: false
+
+$defs:
+  FlowTarget:
+    title: "Flow Target"
+    description: "A flow being targeted with optional step specification"
+    type: object
+    required:
+      - flow
+    properties:
+      flow:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/FlowID"
+        description: "The flow ID"
+      steps:
+        type: array
+        items:
+          type: integer
+          minimum: 1
+        description: "Specific step numbers being targeted"
+      anchor:
+        type: string
+        description: "Anchor reference like 'F-SHOP-CHECKOUT#step=3'"
+    additionalProperties: false
+
+  AttackVector:
+    title: "Attack Vector"
+    description: "Method of attack execution"
+    type: object
+    required:
+      - anchor
+      - manipulation
+    properties:
+      anchor:
+        $ref: "#/$defs/AttackAnchor"
+        description: "What is being targeted/manipulated"
+      manipulation:
+        $ref: "#/$defs/Manipulation"
+        description: "How the anchor is perturbed"
+      state_entailments:
+        type: array
+        items:
+          type: string
+        description: "Cross-concept state relationships to observe"
+      parameter_bindings:
+        type: array
+        items:
+          $ref: "#/$defs/ParameterBinding"
+        description: "Concrete parameter bindings for the attack"
+      negative_sequence:
+        $ref: "#/$defs/NegativeSequence"
+        description: "How steps are skipped, reordered, or perturbed"
+    additionalProperties: false
+
+  AttackAnchor:
+    title: "Attack Anchor"
+    description: "The point of attack"
+    type: object
+    required:
+      - type
+      - ref
+    properties:
+      type:
+        type: string
+        enum:
+          - interaction
+          - flow_step
+          - state
+          - parameter
+          - entry_point
+        description: "Type of anchor point"
+      ref:
+        type: string
+        description: "Reference to the anchor (I-*, F-*#step=N, C-*.state, etc.)"
+      description:
+        type: string
+        description: "What this anchor represents"
+    additionalProperties: false
+
+  Manipulation:
+    title: "Manipulation"
+    description: "How the anchor is manipulated"
+    type: object
+    required:
+      - type
+      - details
+    properties:
+      type:
+        type: string
+        enum:
+          - skip_step
+          - reorder
+          - mutate_param
+          - set_state
+          - fault_injection
+          - timing
+          - replay
+          - inject
+        description: "Type of manipulation"
+      details:
+        type: string
+        description: "Specific details of the manipulation"
+    additionalProperties: false
+
+  ParameterBinding:
+    title: "Parameter Binding"
+    description: "Concrete parameter value for the attack"
+    type: object
+    required:
+      - name
+      - value
+    properties:
+      name:
+        type: string
+        description: "Parameter name"
+      value:
+        description: "Parameter value"
+      description:
+        type: string
+        description: "Why this value is chosen"
+    additionalProperties: false
+
+  NegativeSequence:
+    title: "Negative Sequence"
+    description: "Description of step perturbation"
+    type: object
+    required:
+      - description
+    properties:
+      description:
+        type: string
+        description: "How steps are skipped, reordered, or perturbed"
+      expected_rejection:
+        type: array
+        items:
+          $ref: "#/$defs/ExpectedRejection"
+        description: "Which pre-invariants should fail and where"
+    additionalProperties: false
+
+  ExpectedRejection:
+    title: "Expected Rejection"
+    description: "Expected invariant failure point"
+    type: object
+    required:
+      - invariant
+    properties:
+      invariant:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        description: "Invariant that should reject the attempt"
+      at:
+        type: string
+        description: "Where rejection should occur (step, interaction)"
+      error_code:
+        type: integer
+        description: "Expected HTTP error code"
+    additionalProperties: false
+
+  ExpectedOutcome:
+    title: "Expected Outcome"
+    description: "What results indicate attack success or failure"
+    type: object
+    required:
+      - if_vulnerable
+      - if_secure
+    properties:
+      if_vulnerable:
+        type: string
+        description: "What happens if the system is vulnerable (invariant violated)"
+      if_secure:
+        type: string
+        description: "What happens if the system is secure (invariant enforced)"
+    additionalProperties: false
+
+  AcceptanceCriteria:
+    title: "Acceptance Criteria"
+    description: "Criteria for validating or refuting the hypothesis"
+    type: object
+    properties:
+      violation:
+        type: array
+        items:
+          type: string
+        description: "Observations that confirm invariant violation"
+      enforcement:
+        type: array
+        items:
+          type: string
+        description: "Observations that confirm guard/effect holds"
+    additionalProperties: false
+
+  GeneratorRef:
+    title: "Generator Reference"
+    description: "Reference to a scenario generator"
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/GeneratorID"
+        description: "Generator ID"
+      name:
+        type: string
+        description: "Human-friendly generator name"
+      strategy:
+        type: string
+        description: "Strategy used (e.g., Skip-Step, Param-Mutator)"
+      config:
+        type: object
+        additionalProperties: true
+        description: "Generator configuration parameters"
+    additionalProperties: false
+
+  ScenarioObservability:
+    title: "Scenario Observability"
+    description: "Live validation evidence - add only after testing"
+    type: object
+    properties:
+      tested_at:
+        type: string
+        format: date-time
+        description: "When the scenario was tested"
+      environment:
+        type: string
+        description: "Test environment"
+      result:
+        type: string
+        enum:
+          - vulnerable
+          - secure
+          - inconclusive
+        description: "Test outcome"
+      evidence:
+        type: array
+        items:
+          type: string
+        description: "Concrete evidence from testing"
+      exploration_ref:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ExplorationID"
+        description: "Link to the exploration that tested this scenario"
+    additionalProperties: false

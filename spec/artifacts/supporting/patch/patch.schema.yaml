@@ -1,0 +1,443 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://cfse.dev/schemas/artifacts/patch.schema.yaml"
+title: "CFSE Patch Artifact Schema"
+description: |
+  Schema for Patch artifacts - structured remediation documents that follow
+  the 4V methodology: Verify, Validate, Vaccinate, Valuate. Patches transform
+  confirmed vulnerabilities into durable security improvements.
+
+type: object
+
+required:
+  - id
+  - finding_ref
+  - root_cause
+  - fix_description
+  - verification
+
+properties:
+  id:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/PatchID"
+    description: |
+      Unique identifier for the patch following the pattern PATCH-<SYSTEM>-<NNN>.
+      Example: PATCH-AWS-001, PATCH-SHOP-042, PATCH-K8S-003
+
+  title:
+    type: string
+    minLength: 1
+    maxLength: 150
+    description: |
+      Short description of the patch. Should clearly describe what is being
+      fixed without requiring additional context.
+    examples:
+      - "Fix ownership checks on document delete()"
+      - "Add MFA requirement for admin console access"
+      - "Prevent IDOR in order retrieval endpoint"
+
+  finding_ref:
+    $ref: "#/$defs/FindingReference"
+    description: |
+      Reference to the finding(s) this patch addresses. Links the patch
+      to the invariant, scenario, and exploration that identified the issue.
+
+  root_cause:
+    $ref: "#/$defs/RootCause"
+    description: |
+      Analysis of the underlying implementation issue that allowed the
+      invariant violation. The root cause explains WHY the vulnerability
+      exists, not just WHAT the vulnerability is.
+
+  fix_description:
+    type: string
+    minLength: 10
+    maxLength: 2000
+    description: |
+      Plain-language description of the changes made to fix the vulnerability.
+      Should be understandable by non-technical stakeholders while providing
+      enough detail for technical review.
+
+  code_changes:
+    type: array
+    items:
+      $ref: "#/$defs/CodeChange"
+    description: |
+      Specific code changes made as part of this patch. Each change includes
+      file location and description of the modification.
+
+  verification:
+    $ref: "#/$defs/Verification"
+    description: |
+      The Verify phase of 4V: How the fix was verified to work. Documents
+      which explorations were re-run and their before/after results.
+
+  validation:
+    $ref: "#/$defs/Validation"
+    description: |
+      The Validate phase of 4V: Broader validation that the fix is complete
+      and does not introduce regressions. Includes additional test coverage.
+
+  vaccination:
+    $ref: "#/$defs/Vaccination"
+    description: |
+      The Vaccinate phase of 4V: Systemic changes that prevent similar
+      vulnerabilities from occurring elsewhere. This is where individual
+      fixes become patterns.
+
+  valuation:
+    $ref: "#/$defs/Valuation"
+    description: |
+      The Valuate phase of 4V: Assessment of the security improvement's
+      value, metrics, and lessons learned.
+
+  related_invariants:
+    type: array
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+    uniqueItems: true
+    description: |
+      Invariants that are affected by this patch. Includes both the
+      violated invariant and any new or strengthened invariants.
+
+  status:
+    $ref: "#/$defs/PatchStatus"
+    default: "DRAFT"
+    description: |
+      Current status of the patch through its lifecycle.
+
+  created_at:
+    type: string
+    format: date-time
+    description: |
+      When the patch document was created.
+
+  completed_at:
+    type: string
+    format: date-time
+    description: |
+      When the patch was fully deployed and verified.
+
+  extensions:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    description: |
+      Optional extension-specific fields. Extensions MUST be declared by the
+      corpus to be validated. See foundations/extensions.md.
+
+additionalProperties: false
+
+$defs:
+  FindingReference:
+    title: "Finding Reference"
+    description: "Reference to the finding this patch addresses"
+    type: object
+    required:
+      - finding_id
+      - invariant
+    properties:
+      finding_id:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/FindingID"
+        description: "The finding being patched"
+      invariant:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        description: "The invariant that was violated"
+      scenario:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ScenarioID"
+        description: "The scenario that exposed the issue"
+      exploration:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ExplorationID"
+        description: "The exploration that confirmed the vulnerability"
+      impact:
+        type: string
+        description: "Short description of practical security impact"
+    additionalProperties: false
+
+  RootCause:
+    title: "Root Cause Analysis"
+    description: "Analysis of why the vulnerability exists"
+    type: object
+    required:
+      - issue
+    properties:
+      issue:
+        type: string
+        minLength: 10
+        description: |
+          Description of the root cause. Explains the fundamental issue
+          that allowed the vulnerability, not just its symptoms.
+      code_locations:
+        type: array
+        items:
+          $ref: "#/$defs/CodeLocation"
+        description: "Specific code locations where the issue exists"
+      pattern:
+        type: string
+        description: |
+          The broader pattern of vulnerability this represents.
+          Helps identify similar issues elsewhere.
+      contributing_factors:
+        type: array
+        items:
+          type: string
+        description: "Factors that contributed to this vulnerability"
+    additionalProperties: false
+
+  CodeLocation:
+    title: "Code Location"
+    description: "A specific location in source code"
+    type: object
+    required:
+      - file
+    properties:
+      file:
+        type: string
+        description: "File path relative to repository root"
+      line:
+        type: integer
+        minimum: 1
+        description: "Line number"
+      function:
+        type: string
+        description: "Function or method name"
+      snippet:
+        type: string
+        description: "Relevant code snippet"
+    additionalProperties: false
+
+  CodeChange:
+    title: "Code Change"
+    description: "A code modification made by this patch"
+    type: object
+    required:
+      - file
+      - description
+    properties:
+      file:
+        type: string
+        description: "File path that was modified"
+      description:
+        type: string
+        description: "Description of the change"
+      change_type:
+        type: string
+        enum:
+          - added
+          - modified
+          - deleted
+          - moved
+        description: "Type of change"
+      commit:
+        type: string
+        description: "Git commit SHA for this change"
+      pull_request:
+        type: string
+        format: uri
+        description: "Pull request URL"
+    additionalProperties: false
+
+  Verification:
+    title: "Verification (4V Phase 1)"
+    description: "Verify: Confirm the fix works by re-running explorations"
+    type: object
+    required:
+      - explorations_rerun
+    properties:
+      explorations_rerun:
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/ExplorationResult"
+        description: |
+          Explorations that were re-run against the patched code.
+          Should include the original failing exploration.
+      additional_tests:
+        type: array
+        items:
+          type: string
+        description: "Additional tests or variations performed"
+      verified_by:
+        type: string
+        description: "Person or process that performed verification"
+      verified_at:
+        type: string
+        format: date-time
+        description: "When verification was completed"
+    additionalProperties: false
+
+  ExplorationResult:
+    title: "Exploration Result"
+    description: "Before/after result of re-running an exploration"
+    type: object
+    required:
+      - exploration_id
+      - result_before
+      - result_after
+    properties:
+      exploration_id:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ExplorationID"
+        description: "The exploration that was re-run"
+      result_before:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantState"
+        description: "Result before the patch (should be VIOLATED)"
+      result_after:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantState"
+        description: "Result after the patch (should be HOLDS)"
+      notes:
+        type: string
+        description: "Additional notes about the result"
+    additionalProperties: false
+
+  Validation:
+    title: "Validation (4V Phase 2)"
+    description: "Validate: Ensure completeness and no regressions"
+    type: object
+    properties:
+      regression_tests:
+        type: array
+        items:
+          type: string
+        description: "Regression tests added or run"
+      edge_cases:
+        type: array
+        items:
+          type: string
+        description: "Edge cases verified"
+      integration_tests:
+        type: array
+        items:
+          type: string
+        description: "Integration tests performed"
+      reviewed_by:
+        type: array
+        items:
+          type: string
+        description: "Reviewers who validated the patch"
+      notes:
+        type: string
+        description: "Additional validation notes"
+    additionalProperties: false
+
+  Vaccination:
+    title: "Vaccination (4V Phase 3)"
+    description: "Vaccinate: Systemic changes to prevent similar issues"
+    type: object
+    properties:
+      change_type:
+        type: string
+        enum:
+          - middleware
+          - library
+          - framework
+          - pattern
+          - configuration
+          - documentation
+          - training
+          - linting
+          - none
+        description: "Type of systemic change"
+      description:
+        type: string
+        description: "How this prevents similar bugs system-wide"
+      new_invariants:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        description: "New invariants added to the library"
+      strengthened_invariants:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        description: "Existing invariants that were strengthened"
+      automation:
+        type: array
+        items:
+          type: string
+        description: "Automated checks or tools added"
+      scope:
+        type: string
+        description: "Scope of the systemic change"
+    additionalProperties: false
+
+  Valuation:
+    title: "Valuation (4V Phase 4)"
+    description: "Valuate: Assess the security improvement's value"
+    type: object
+    properties:
+      metrics:
+        type: object
+        additionalProperties: true
+        description: "Quantitative metrics about the improvement"
+      status_overlay_updates:
+        type: array
+        items:
+          $ref: "#/$defs/StatusOverlayUpdate"
+        description: "Updates to invariant status overlay"
+      lessons_learned:
+        type: array
+        items:
+          type: string
+        description: "Lessons learned from this vulnerability and fix"
+      recommendations:
+        type: array
+        items:
+          type: string
+        description: "Recommendations for future prevention"
+      business_impact:
+        type: string
+        description: "Business impact of the fix"
+    additionalProperties: false
+
+  StatusOverlayUpdate:
+    title: "Status Overlay Update"
+    description: "Update to invariant enforcement status"
+    type: object
+    required:
+      - invariant
+      - previous_status
+      - new_status
+    properties:
+      invariant:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        description: "The invariant being updated"
+      scope:
+        type: string
+        description: "Scope where status changed"
+      previous_status:
+        type: string
+        enum:
+          - KNOWN_MISSING
+          - UNKNOWN
+          - PARTIAL
+        description: "Previous enforcement status"
+      new_status:
+        type: string
+        enum:
+          - KNOWN_PRESENT
+          - PARTIAL
+          - VERIFIED
+        description: "New enforcement status"
+      evidence:
+        type: string
+        description: "Evidence for the status change"
+    additionalProperties: false
+
+  PatchStatus:
+    title: "Patch Status"
+    description: "Lifecycle status of the patch"
+    type: string
+    enum:
+      - DRAFT
+      - IN_PROGRESS
+      - VERIFICATION
+      - VALIDATION
+      - VACCINATION
+      - VALUATION
+      - COMPLETE
+      - REJECTED
+    x-enum-descriptions:
+      DRAFT: "Initial creation, not yet started"
+      IN_PROGRESS: "Fix being implemented"
+      VERIFICATION: "Fix being verified (4V Phase 1)"
+      VALIDATION: "Fix being validated (4V Phase 2)"
+      VACCINATION: "Systemic changes being applied (4V Phase 3)"
+      VALUATION: "Value assessment in progress (4V Phase 4)"
+      COMPLETE: "All 4V phases complete"
+      REJECTED: "Patch rejected or superseded"

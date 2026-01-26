@@ -1,0 +1,453 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://cfse.dev/schemas/artifacts/interaction.schema.yaml"
+title: "CFSE Interaction Artifact Schema"
+description: |
+  Schema for Interaction artifacts - atomic operations between concepts.
+  Interactions represent single-step actions where one concept's entry point
+  is exercised, with precise data flow, trust boundaries, and invariant-backed
+  pre/post conditions.
+
+type: object
+
+required:
+  - id
+  - name
+  - from_concept
+  - to_concept
+  - action
+  - entry_points
+  - data_flow
+  - pre_invariants
+  - post_invariants
+  - error_responses
+
+properties:
+  id:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+    description: |
+      Unique identifier for the interaction following the pattern I-<SYSTEM>-<ACTION>-<TARGET>-<NNN>.
+      Example: I-SHOP-DELETE-ITEM-001, I-AWS-ASSUME-ROLE-042, I-K8S-CREATE-POD-003
+
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+    description: |
+      Human-readable name for the interaction. Should describe the action being
+      performed in clear, domain-specific language.
+    examples:
+      - "User Deletes Own Item"
+      - "Service Assumes IAM Role"
+      - "Admin Creates Kubernetes Pod"
+
+  description:
+    type: string
+    minLength: 10
+    maxLength: 1000
+    description: |
+      Detailed description of what this interaction accomplishes, including its
+      purpose, context, and any important behavioral details.
+
+  from_concept:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+    description: |
+      The concept that initiates the interaction (the actor/subject).
+      This is typically a user, service, or other principal.
+
+  to_concept:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+    description: |
+      The concept that receives the interaction (the target/object).
+      This is typically a resource being accessed or modified.
+
+  intermediaries:
+    type: array
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+    uniqueItems: true
+    description: |
+      Optional concepts that are involved in the interaction path but are neither
+      the initiator nor the target. Examples: authentication services, message
+      queues, caches.
+
+  action:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ActionType"
+    description: |
+      The type of operation being performed: CREATE, READ, UPDATE, DELETE,
+      ACCESS, EXECUTE, ASSUME, GRANT, or REVOKE.
+
+  entry_points:
+    type: array
+    minItems: 1
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/EntryPointID"
+    description: |
+      References to Entry Point artifacts (EP-*) through which this interaction can be triggered.
+      Entry point surface details (method/path/inputs/tangible locations) live in the EP artifact.
+
+  data_flow:
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/DataFlowItem"
+    description: |
+      Documents what data is read, written, created, or deleted during this
+      interaction. Each item specifies the mode, concept, attribute, and any
+      relevant notes.
+
+  trust:
+    $ref: "#/$defs/TrustBoundary"
+    description: |
+      Optional trust boundary information documenting untrusted inputs,
+      validation points, output encoding, and boundary crossings.
+
+  key_transformations:
+    type: array
+    items:
+      $ref: "#/$defs/Transformation"
+    description: |
+      Summarizes significant updates, creates, deletes, and state transitions
+      that occur during this interaction.
+
+  state_transition:
+    $ref: "#/$defs/StateTransition"
+    description: |
+      If this interaction causes a state change in the target concept, document
+      the from/to states and any guard conditions.
+
+  related_interactions:
+    $ref: "#/$defs/RelatedInteractions"
+    description: |
+      References to prerequisite, subsequent, and alternative interactions that
+      form the broader interaction context.
+
+  pre_invariants:
+    type: array
+    minItems: 1
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+    uniqueItems: true
+    description: |
+      List of invariant IDs (INV-*) that must hold before this interaction can
+      execute. These are the guards that protect the interaction.
+
+  post_invariants:
+    type: array
+    minItems: 1
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+    uniqueItems: true
+    description: |
+      List of invariant IDs (INV-*) that must hold after successful execution.
+      These are the guarantees the interaction provides.
+
+  error_responses:
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/ErrorResponse"
+    description: |
+      Documents expected error responses, including status codes, conditions
+      that trigger them, and which invariants they relate to.
+
+  security_insights:
+    $ref: "#/$defs/SecurityInsights"
+    description: |
+      Optional security analysis including red flags, risk signals, assumptions,
+      gaps, and external dependencies.
+
+  observability:
+    $ref: "#/$defs/Observability"
+    description: |
+      Add only after live validation. Documents concrete commands and sample
+      outputs that prove the interaction executed correctly.
+
+  status:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    default: "DRAFT"
+    description: |
+      Lifecycle status of this interaction artifact. Use DRAFT for work in
+      progress, ACTIVE for reviewed interactions, DEPRECATED for interactions
+      being phased out.
+
+  version:
+    type: string
+    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    description: |
+      Semantic version of this interaction definition.
+    examples:
+      - "1.0.0"
+      - "2.1.3"
+
+  extensions:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    description: |
+      Optional extension-specific fields. Extensions MUST be declared by the
+      corpus to be validated. See foundations/extensions.md.
+
+additionalProperties: false
+
+$defs:
+  DataFlowItem:
+    title: "Data Flow Item"
+    description: "A single data operation within the interaction"
+    type: object
+    required:
+      - mode
+      - concept
+      - attribute
+    properties:
+      mode:
+        type: string
+        enum:
+          - READ
+          - WRITE
+          - CREATE
+          - DELETE
+        description: "Type of data operation"
+      concept:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+        description: "The concept whose data is being accessed"
+      attribute:
+        type: string
+        description: "The attribute or relation being accessed (e.g., 'status', 'owner_id', 'EXISTS(items)')"
+      reference:
+        type: string
+        description: "Reference notation like 'C-SHOP-ITEM.owner_id' or relationship expression"
+      notes:
+        type: string
+        description: "Additional context about this data flow"
+    additionalProperties: false
+
+  TrustBoundary:
+    title: "Trust Boundary"
+    description: "Trust boundary information for the interaction"
+    type: object
+    properties:
+      user_input:
+        type: array
+        items:
+          type: string
+        description: "List of untrusted user inputs"
+      validation_points:
+        type: array
+        items:
+          type: string
+        description: "Where validation occurs"
+      output_encoding:
+        type: array
+        items:
+          type: string
+        description: "Output encoding applied"
+      boundary_crossings:
+        type: array
+        items:
+          $ref: "#/$defs/BoundaryCrossing"
+        description: "Trust boundaries crossed during interaction"
+    additionalProperties: false
+
+  BoundaryCrossing:
+    title: "Boundary Crossing"
+    description: "A trust boundary that is crossed"
+    type: object
+    required:
+      - label
+    properties:
+      label:
+        type: string
+        description: "Name of the boundary (e.g., 'auth', 'network', 'tenant')"
+      from:
+        type: string
+        description: "Source zone"
+      to:
+        type: string
+        description: "Target zone"
+      notes:
+        type: string
+        description: "Security implications"
+    additionalProperties: false
+
+  Transformation:
+    title: "Key Transformation"
+    description: "A significant data or state change"
+    type: object
+    required:
+      - type
+      - description
+    properties:
+      type:
+        type: string
+        enum:
+          - CREATE
+          - UPDATE
+          - DELETE
+          - STATE_CHANGE
+        description: "Type of transformation"
+      description:
+        type: string
+        description: "What changes"
+      from_state:
+        type: string
+        description: "Starting state (for STATE_CHANGE)"
+      to_state:
+        type: string
+        description: "Ending state (for STATE_CHANGE)"
+      interaction_id:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+        description: "Reference to related interaction if modeling entry/exit actions"
+    additionalProperties: false
+
+  StateTransition:
+    title: "State Transition"
+    description: "State change caused by this interaction"
+    type: object
+    required:
+      - concept
+      - from
+      - to
+    properties:
+      concept:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+        description: "The concept whose state changes"
+      from:
+        type: string
+        description: "Starting state"
+      to:
+        type: string
+        description: "Ending state"
+      guard:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        description: "Invariant that must hold for transition"
+      effects:
+        type: array
+        items:
+          type: string
+        description: "Side effects of this transition"
+    additionalProperties: false
+
+  RelatedInteractions:
+    title: "Related Interactions"
+    description: "Connections to other interactions"
+    type: object
+    properties:
+      prerequisite:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+        description: "Interactions that must occur before this one"
+      subsequent:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+        description: "Interactions that typically follow this one"
+      alternative:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+        description: "Alternative ways to achieve similar outcomes"
+    additionalProperties: false
+
+  ErrorResponse:
+    title: "Error Response"
+    description: "Expected error response from the interaction"
+    type: object
+    required:
+      - code
+      - condition
+    properties:
+      code:
+        type: integer
+        minimum: 400
+        maximum: 599
+        description: "HTTP status code"
+      condition:
+        type: string
+        description: "What triggers this error"
+      response_body:
+        type: string
+        description: "Expected response body pattern"
+      related_invariant:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        description: "Invariant that enforces this error condition"
+    additionalProperties: false
+
+  SecurityInsights:
+    title: "Security Insights"
+    description: "Security analysis notes"
+    type: object
+    properties:
+      red_flags:
+        type: array
+        items:
+          type: string
+        description: "Potential security concerns"
+      risk_signals:
+        type: array
+        items:
+          type: string
+        description: "Indicators of risk"
+      assumptions:
+        type: array
+        items:
+          type: string
+        description: "Security assumptions being made"
+      gaps:
+        type: array
+        items:
+          type: string
+        description: "Identified security gaps"
+      external_dependencies:
+        type: array
+        items:
+          type: string
+        description: "External systems this interaction depends on"
+    additionalProperties: false
+
+  Observability:
+    title: "Observability"
+    description: "Live validation evidence - add only after testing"
+    type: object
+    properties:
+      commands:
+        type: array
+        items:
+          $ref: "#/$defs/ObservabilityCommand"
+        description: "Commands used to validate the interaction"
+      sample_outputs:
+        type: array
+        items:
+          type: string
+        description: "Minimal sample outputs proving execution"
+      validated_at:
+        type: string
+        format: date-time
+        description: "When live validation was performed"
+      environment:
+        type: string
+        description: "Environment where validation occurred"
+    additionalProperties: false
+
+  ObservabilityCommand:
+    title: "Observability Command"
+    description: "A command used for live validation"
+    type: object
+    required:
+      - type
+      - command
+    properties:
+      type:
+        type: string
+        enum:
+          - curl
+          - httpie
+          - cli
+          - db_query
+          - other
+        description: "Type of command"
+      command:
+        type: string
+        description: "The actual command"
+      description:
+        type: string
+        description: "What this command validates"
+    additionalProperties: false

@@ -1,0 +1,250 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://cfse.dev/schemas/artifacts/invariant.schema.yaml"
+title: "CFSE Invariant Artifact Schema"
+description: |
+  Schema for Invariant artifacts - the heart of CFSE security logic.
+  Invariants are rules that must always hold true in a secure system.
+  They codify security requirements as formal expressions using predicates,
+  enabling systematic testing and verification.
+
+type: object
+
+required:
+  - id
+  - rule
+  - logic
+  - predicates
+  - criticality
+  - tags
+
+properties:
+  id:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+    description: |
+      Unique identifier for the invariant following the pattern INV-<SYSTEM>-<NAME>.
+      Example: INV-SHOP-OWNER-DELETE, INV-AWS-NO-PUBLIC-S3, INV-K8S-POD-SECURITY
+
+  rule:
+    type: string
+    minLength: 10
+    maxLength: 500
+    description: |
+      Plain English statement of the security rule. Should be clear, unambiguous,
+      and understandable without reading the formal logic. This is what gets
+      communicated to stakeholders.
+    examples:
+      - "Only resource owners can delete their own resources"
+      - "All API endpoints require authentication"
+      - "Admin privileges require multi-factor authentication"
+
+  logic:
+    type: string
+    minLength: 10
+    description: |
+      Formal logical expression using CFSE predicate notation. Uses quantifiers
+      (FORALL, EXISTS), logical operators (AND, OR, NOT, IMPLIES, IFF), and
+      predicate applications. The logic must be syntactically valid and
+      semantically match the rule.
+    examples:
+      - "FORALL item: C-SHOP-ITEM. DELETE(user, item) IMPLIES P-SHOP-IS-OWNER(user, item)"
+      - "FORALL ep: EntryPoint. ACCESS(user, ep) IMPLIES P-AUTH-AUTHENTICATED(user)"
+
+  predicates:
+    type: array
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/PredicateID"
+    minItems: 1
+    uniqueItems: true
+    description: |
+      List of predicate IDs (P-*) used in the logic expression. Every predicate
+      referenced in the logic field must be listed here for traceability.
+
+  criticality:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Criticality"
+    description: |
+      Priority level indicating severity if this invariant is violated:
+      - P0: Critical - Immediate action required (< 24 hours)
+      - P1: High - Urgent attention needed (< 1 week)
+      - P2: Medium - Plan remediation (< 1 month)
+      - P3: Low - Address when convenient
+
+  tags:
+    type: array
+    items:
+      $ref: "#/$defs/InvariantTag"
+    minItems: 1
+    uniqueItems: true
+    description: |
+      Category tags for filtering and organizing invariants. Each invariant
+      should have at least one tag indicating its security domain.
+
+  dependencies:
+    type: array
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+    uniqueItems: true
+    description: |
+      Other invariant IDs that this invariant depends on or assumes.
+      If a dependency is violated, this invariant may also be compromised.
+
+  observability:
+    $ref: "#/$defs/Observability"
+    description: |
+      How to detect when this invariant is violated or at risk. Includes
+      logging requirements, metrics, and monitoring recommendations.
+
+  aliases:
+    type: array
+    items:
+      type: string
+      pattern: "^INV-[A-Z0-9]{2,8}-[A-Z0-9-]{1,32}$"
+    uniqueItems: true
+    description: |
+      Previous IDs for this invariant. Used during migrations to maintain
+      backward compatibility and update references.
+
+  status:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    default: "DRAFT"
+    description: |
+      Lifecycle status of this invariant. Use DRAFT for work in progress,
+      ACTIVE for reviewed and enforced invariants, DEPRECATED for rules
+      being phased out.
+
+  extensions:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    description: |
+      Optional extension-specific fields. Extensions MUST be declared by the
+      corpus to be validated. See foundations/extensions.md.
+
+additionalProperties: false
+
+$defs:
+  InvariantTag:
+    title: "Invariant Tag"
+    description: "Category tag for invariant classification"
+    type: string
+    enum:
+      - authn
+      - authz
+      - ownership
+      - state
+      - data
+      - integrity
+      - confidentiality
+      - availability
+    x-enum-descriptions:
+      authn: "Authentication - verifying identity"
+      authz: "Authorization - verifying permissions"
+      ownership: "Resource ownership and access control"
+      state: "State machine and lifecycle constraints"
+      data: "Data validation and format requirements"
+      integrity: "Data integrity and consistency"
+      confidentiality: "Information disclosure prevention"
+      availability: "Service availability and resilience"
+
+  Observability:
+    title: "Observability Configuration"
+    description: "How to detect invariant violations"
+    type: object
+    properties:
+      logs:
+        type: array
+        items:
+          $ref: "#/$defs/LogRequirement"
+        description: "Log events that indicate invariant state"
+      metrics:
+        type: array
+        items:
+          $ref: "#/$defs/MetricRequirement"
+        description: "Metrics to monitor for violations"
+      alerts:
+        type: array
+        items:
+          $ref: "#/$defs/AlertRequirement"
+        description: "Alert configurations for violation detection"
+      audit_query:
+        type: string
+        description: "Query to audit historical compliance"
+    additionalProperties: false
+
+  LogRequirement:
+    title: "Log Requirement"
+    description: "A log event requirement for observability"
+    type: object
+    required:
+      - event
+      - fields
+    properties:
+      event:
+        type: string
+        description: "Log event name or pattern"
+      fields:
+        type: array
+        items:
+          type: string
+        description: "Required fields in the log event"
+      indicates:
+        type: string
+        enum:
+          - holds
+          - violated
+          - attempted
+        description: "What this log event indicates about the invariant"
+    additionalProperties: false
+
+  MetricRequirement:
+    title: "Metric Requirement"
+    description: "A metric for monitoring invariant health"
+    type: object
+    required:
+      - name
+      - type
+    properties:
+      name:
+        type: string
+        description: "Metric name"
+      type:
+        type: string
+        enum:
+          - counter
+          - gauge
+          - histogram
+        description: "Metric type"
+      labels:
+        type: array
+        items:
+          type: string
+        description: "Metric labels/dimensions"
+      threshold:
+        type: number
+        description: "Threshold value for alerting"
+    additionalProperties: false
+
+  AlertRequirement:
+    title: "Alert Requirement"
+    description: "An alert configuration for violation detection"
+    type: object
+    required:
+      - name
+      - condition
+      - severity
+    properties:
+      name:
+        type: string
+        description: "Alert name"
+      condition:
+        type: string
+        description: "Condition that triggers the alert"
+      severity:
+        type: string
+        enum:
+          - critical
+          - warning
+          - info
+        description: "Alert severity level"
+      runbook:
+        type: string
+        format: uri
+        description: "Link to runbook for responding to this alert"
+    additionalProperties: false

@@ -1,0 +1,273 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://cfse.dev/schemas/artifacts/concept.schema.yaml"
+title: "CFSE Concept Artifact Schema"
+description: |
+  Schema for Concept artifacts - the foundational building blocks of the CFSE world model.
+  Concepts represent the 'nouns' of a system: entities, resources, principals, and other
+  logical units that participate in security-relevant operations.
+
+type: object
+
+required:
+  - id
+  - name
+  - promise
+  - attributes
+  - entry_points
+  - invariants
+
+properties:
+  id:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+    description: |
+      Unique identifier for the concept following the pattern C-<SYSTEM>-<NAME>.
+      Example: C-SHOP-USER, C-AWS-IAM-ROLE, C-K8S-POD
+
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
+    description: |
+      Human-readable name for the concept. Should be clear and descriptive,
+      using domain terminology that stakeholders recognize.
+    examples:
+      - "Shop User"
+      - "IAM Role"
+      - "Kubernetes Pod"
+
+  promise:
+    type: string
+    minLength: 10
+    maxLength: 500
+    description: |
+      Single sentence describing what this concept represents and its security
+      significance. The promise captures the essence of the concept's role in
+      the system's security model.
+    examples:
+      - "A user account that can authenticate, own resources, and perform actions within the shop system."
+      - "An AWS identity with permissions that can be assumed by principals to access AWS resources."
+
+  attributes:
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/Attribute"
+    description: |
+      Data properties of the concept with their types, constraints, and security
+      relevance. Attributes should reflect actual system fields and be validated
+      against implementation.
+
+  entry_points:
+    type: array
+    minItems: 1
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/EntryPointID"
+    description: |
+      References to Entry Point artifacts (EP-*) owned by this concept. Entry point
+      details (method/path/tangible locations/exposure inventory) live in the EP artifact.
+
+  invariants:
+    type: array
+    items:
+      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+    uniqueItems: true
+    description: |
+      List of invariant IDs (INV-*) that govern this concept. Invariants define
+      security rules that must hold for all instances of this concept. Reference
+      IDs only - never inline invariant logic.
+
+  states:
+    $ref: "#/$defs/StateMachine"
+    description: |
+      Optional state machine if the concept has a lifecycle with discrete states
+      and transitions. States can affect which operations are valid and which
+      invariants apply.
+
+  how_it_works:
+    type: string
+    minLength: 20
+    maxLength: 2000
+    description: |
+      High-level description of how the concept operates internally. This is NOT
+      implementation code, but rather a logical summary of the underlying mechanism,
+      key implementation patterns, and how the concept achieves its security properties.
+      This helps analysts understand the concept deeply enough to identify potential
+      security weaknesses.
+    examples:
+      - "Authentication tokens are generated using HMAC-SHA256 with a server-side secret. Tokens include the user ID, expiration timestamp, and a nonce. Validation checks signature integrity, expiration, and revocation status against a Redis blacklist."
+
+  security_investigation_candidates:
+    type: array
+    items:
+      type: string
+      minLength: 10
+      maxLength: 500
+    description: |
+      Potential security weaknesses, fragility points, or areas worth exploring for
+      this concept. These are hypotheses about what could go wrong - they feed directly
+      into invariant definition and scenario creation. Each candidate should identify
+      a potential weakness, why it might be exploitable, and what type of attack it
+      might enable.
+    examples:
+      - - "Token expiration bypass - what if system clock is manipulated?"
+        - "Race condition in balance updates - concurrent purchases might overdraw"
+        - "Role escalation through parameter tampering - is role validated server-side?"
+
+  status:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    default: "DRAFT"
+    description: |
+      Lifecycle status of this concept artifact. Use DRAFT for work in progress,
+      ACTIVE for reviewed and authoritative concepts, DEPRECATED for concepts
+      being phased out.
+
+  version:
+    type: string
+    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    description: |
+      Semantic version of this concept definition. Increment when attributes,
+      entry points, or invariants change.
+    examples:
+      - "1.0.0"
+      - "2.1.3"
+
+  extensions:
+    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    description: |
+      Optional extension-specific fields. Extensions MUST be declared by the
+      corpus to be validated. See foundations/extensions.md.
+
+additionalProperties: false
+
+$defs:
+  Attribute:
+    title: "Concept Attribute"
+    description: "A data property of the concept with type and security metadata"
+    type: object
+    required:
+      - name
+      - type
+    properties:
+      name:
+        type: string
+        pattern: "^[a-z][a-z0-9_]*$"
+        description: "Attribute name in snake_case, matching system field name"
+      type:
+        type: string
+        enum:
+          - string
+          - integer
+          - boolean
+          - array
+          - object
+          - uuid
+          - timestamp
+          - enum
+        description: "Data type of the attribute"
+      required:
+        type: boolean
+        default: true
+        description: "Whether this attribute must be present"
+      default:
+        description: "Default value when not explicitly set"
+      sensitive:
+        type: boolean
+        default: false
+        description: "Whether this attribute contains sensitive data (PII, secrets, etc.)"
+      immutable:
+        type: boolean
+        default: false
+        description: "Whether this attribute can be changed after creation"
+      description:
+        type: string
+        description: "Human-readable description of the attribute's purpose"
+      constraints:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Constraint"
+        description: "Validation constraints for this attribute"
+      enum_values:
+        type: array
+        items:
+          type: string
+        description: "Allowed values when type is 'enum'"
+    additionalProperties: false
+
+  StateMachine:
+    title: "State Machine"
+    description: "Lifecycle states and transitions for the concept"
+    type: object
+    required:
+      - states
+      - initial
+      - transitions
+    properties:
+      states:
+        type: array
+        items:
+          $ref: "#/$defs/State"
+        minItems: 2
+        description: "All possible states for this concept"
+      initial:
+        type: string
+        description: "The starting state for new instances"
+      transitions:
+        type: array
+        items:
+          $ref: "#/$defs/Transition"
+        minItems: 1
+        description: "Valid state transitions"
+    additionalProperties: false
+
+  State:
+    title: "Concept State"
+    description: "A discrete state in the concept's lifecycle"
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        pattern: "^[A-Z][A-Z0-9_]*$"
+        description: "State name in UPPER_SNAKE_CASE"
+      description:
+        type: string
+        description: "What this state represents"
+      terminal:
+        type: boolean
+        default: false
+        description: "Whether this is a final state with no outgoing transitions"
+      invariants:
+        type: array
+        items:
+          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        description: "Additional invariants that apply in this state"
+    additionalProperties: false
+
+  Transition:
+    title: "State Transition"
+    description: "A valid transition between states"
+    type: object
+    required:
+      - from
+      - to
+      - trigger
+    properties:
+      from:
+        type: string
+        description: "Source state name"
+      to:
+        type: string
+        description: "Target state name"
+      trigger:
+        type: string
+        description: "What causes this transition (interaction ID or event name)"
+      guard:
+        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        description: "Invariant that must hold for transition to be valid"
+      effects:
+        type: array
+        items:
+          type: string
+        description: "Side effects of this transition"
+    additionalProperties: false
