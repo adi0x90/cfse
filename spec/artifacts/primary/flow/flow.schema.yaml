@@ -187,9 +187,9 @@ $defs:
       description:
         type: string
         description: "What specifically triggers the flow"
-      entry_point:
+      initial_interaction:
         $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InteractionID"
-        description: "Initial interaction if triggered by API"
+        description: "Initial interaction that starts the flow (I-*), not an EP-* Entry Point artifact"
       event:
         type: string
         description: "Event name or pattern if event-driven"

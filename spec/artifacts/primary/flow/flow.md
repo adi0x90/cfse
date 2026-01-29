@@ -62,6 +62,12 @@ The goal is expressed as an outcome, not a list of actions:
 
 The goal should answer: "What does the actor want to accomplish?"
 
+### trigger
+
+`trigger` describes what initiates the flow. To name the first operation, set `trigger.initial_interaction` to an `I-*` Interaction ID.
+
+Note: `initial_interaction` is intentionally an Interaction reference; it is not an `EP-*` Entry Point artifact. Surfaces that can start the flow should be modeled via the triggering Interaction's `entry_points` (`EP-*`) and/or the flow's `related` links.
+
 ### preconditions and postconditions
 
 Conditions use a structured format supporting multiple types:
@@ -181,7 +187,7 @@ goal: "Convert a shopping basket into a paid order for a logged-in user"
 trigger:
   type: user_action
   description: "User clicks 'Proceed to Checkout' button"
-  entry_point: I-SHOP-CREATE-ORDER-001
+  initial_interaction: I-SHOP-CREATE-ORDER-001
 
 scope: "From basket to paid order, excludes order fulfillment and shipping"
 
