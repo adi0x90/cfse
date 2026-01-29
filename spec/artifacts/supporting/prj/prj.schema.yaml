@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://cfse.dev/schemas/artifacts/prj.schema.yaml"
+$id: "https://cfse.ai/schemas/artifacts/prj.schema.yaml"
 title: "CFSE Projection (PRJ) Artifact Schema"
 description: "Schema for PRJ-* artifacts (viewer-context projections across surfaces)"
 
@@ -13,7 +13,7 @@ required:
 
 properties:
   id:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ProjectionID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ProjectionID"
     description: "Unique identifier for this PRJ artifact"
 
   title:
@@ -40,11 +40,11 @@ properties:
       predicates:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/PredicateID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/PredicateID"
       invariants:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
     additionalProperties: false
     description: "Traceability references used to define the projection context"
 
@@ -58,7 +58,7 @@ properties:
     type: string
 
   status:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
     default: "DRAFT"
 
   version:
@@ -66,7 +66,7 @@ properties:
     pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
 
   extensions:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Extensions"
 
 additionalProperties: false
 
@@ -77,7 +77,7 @@ $defs:
       - ref
     properties:
       ref:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/EntryPointID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/EntryPointID"
         description: "Reference to an entry point (EP-*)"
       notes:
         type: string
@@ -104,7 +104,7 @@ $defs:
       governed_by_invariants:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
       notes:
         type: string
     additionalProperties: false

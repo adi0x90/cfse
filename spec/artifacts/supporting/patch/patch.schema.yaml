@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://cfse.dev/schemas/artifacts/patch.schema.yaml"
+$id: "https://cfse.ai/schemas/artifacts/patch.schema.yaml"
 title: "CFSE Patch Artifact Schema"
 description: |
   Schema for Patch artifacts - structured remediation documents that follow
@@ -17,7 +17,7 @@ required:
 
 properties:
   id:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/PatchID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/PatchID"
     description: |
       Unique identifier for the patch following the pattern PATCH-<SYSTEM>-<NNN>.
       Example: PATCH-AWS-001, PATCH-SHOP-042, PATCH-K8S-003
@@ -92,7 +92,7 @@ properties:
   related_invariants:
     type: array
     items:
-      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+      $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
     uniqueItems: true
     description: |
       Invariants that are affected by this patch. Includes both the
@@ -117,7 +117,7 @@ properties:
       When the patch was fully deployed and verified.
 
   extensions:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Extensions"
     description: |
       Optional extension-specific fields. Extensions MUST be declared by the
       corpus to be validated. See foundations/extensions.md.
@@ -134,16 +134,16 @@ $defs:
       - invariant
     properties:
       finding_id:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/FindingID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/FindingID"
         description: "The finding being patched"
       invariant:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
         description: "The invariant that was violated"
       scenario:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ScenarioID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ScenarioID"
         description: "The scenario that exposed the issue"
       exploration:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ExplorationID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ExplorationID"
         description: "The exploration that confirmed the vulnerability"
       impact:
         type: string
@@ -272,13 +272,13 @@ $defs:
       - result_after
     properties:
       exploration_id:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ExplorationID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ExplorationID"
         description: "The exploration that was re-run"
       result_before:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantState"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantState"
         description: "Result before the patch (should be VIOLATED)"
       result_after:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantState"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantState"
         description: "Result after the patch (should be HOLDS)"
       notes:
         type: string
@@ -339,12 +339,12 @@ $defs:
       new_invariants:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
         description: "New invariants added to the library"
       strengthened_invariants:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
         description: "Existing invariants that were strengthened"
       automation:
         type: array
@@ -395,7 +395,7 @@ $defs:
       - new_status
     properties:
       invariant:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
         description: "The invariant being updated"
       scope:
         type: string

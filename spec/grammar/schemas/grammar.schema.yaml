@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://cfse.dev/schemas/grammar.schema.yaml"
+$id: "https://cfse.ai/schemas/grammar.schema.yaml"
 title: "CFSE Grammar Schema"
 description: "Reusable type definitions for CFSE artifact validation"
 

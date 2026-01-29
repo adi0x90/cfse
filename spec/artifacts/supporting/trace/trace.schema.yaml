@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://cfse.dev/schemas/artifacts/trace.schema.yaml"
+$id: "https://cfse.ai/schemas/artifacts/trace.schema.yaml"
 title: "CFSE Trace Artifact Schema"
 description: |
   Schema for Trace artifacts - structured evidence for temporal and
@@ -21,7 +21,7 @@ required:
 
 properties:
   id:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/TraceID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/TraceID"
     description: |
       Unique identifier for this trace.
 
@@ -36,12 +36,12 @@ properties:
     description: "Optional narrative context for the trace."
 
   exploration_ref:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ExplorationID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ExplorationID"
     description: |
       Exploration that produced or motivated this trace.
 
   scenario_ref:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ScenarioID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ScenarioID"
     description: |
       Optional scenario linkage (usually derivable from exploration_ref).
 
@@ -78,7 +78,7 @@ properties:
       Facts at a step may include events (actions) and state facts (predicates).
 
   status:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
     default: "DRAFT"
     description: |
       Lifecycle status of this trace artifact.
@@ -89,7 +89,7 @@ properties:
     description: "Semantic version of this trace."
 
   extensions:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Extensions"
     description: |
       Optional extension-specific fields. Extensions MUST be declared by the
       corpus to be validated. See foundations/extensions.md.

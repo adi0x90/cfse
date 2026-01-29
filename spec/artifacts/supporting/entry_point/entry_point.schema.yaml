@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://cfse.dev/schemas/artifacts/entry_point.schema.yaml"
+$id: "https://cfse.ai/schemas/artifacts/entry_point.schema.yaml"
 title: "CFSE Entry Point (EP) Artifact Schema"
 description: |
   Schema for Entry Point artifacts (EP-*).
@@ -21,7 +21,7 @@ required:
 
 properties:
   id:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/EntryPointID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/EntryPointID"
     description: "Unique identifier for this entry point (EP-*)"
 
   title:
@@ -31,7 +31,7 @@ properties:
     description: "Human-readable name of the surface"
 
   owner_concept:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ConceptID"
     description: |
       The concept that owns this entry point. This is the primary concept
       whose instances are created/read/updated/deleted or whose surface is rendered.
@@ -61,7 +61,7 @@ properties:
     description: "Path/pattern, GraphQL operation, event name, or CLI command pattern"
 
   action:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ActionType"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ActionType"
     description: "High-level operation type (CREATE, READ, UPDATE, DELETE, ACCESS, EXECUTE, etc.)"
 
   auth_required:
@@ -78,7 +78,7 @@ properties:
   parameters:
     type: array
     items:
-      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Parameter"
+      $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Parameter"
     description: "Input parameters for this entry point"
 
   attacker_controlled_inputs:
@@ -92,7 +92,7 @@ properties:
   tangible_locations:
     type: array
     items:
-      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/TangibleLocation"
+      $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/TangibleLocation"
     description: "Concrete access locators (URLs, CLI invocations, etc.) for this entry point"
 
   exposes:
@@ -106,7 +106,7 @@ properties:
   governed_by_invariants:
     type: array
     items:
-      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+      $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
     description: |
       Invariants that govern whether/how this surface is permitted or constrained
       (traceability only; invariants carry the logic).
@@ -116,7 +116,7 @@ properties:
     description: "Additional scoping notes"
 
   status:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
     default: "DRAFT"
 
   version:
@@ -124,7 +124,7 @@ properties:
     pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
 
   extensions:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Extensions"
 
 additionalProperties: false
 
@@ -163,7 +163,7 @@ $defs:
       governed_by_invariants:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
         description: "Invariants that govern whether/how the exposure is permitted (traceability only)"
       evidence:
         $ref: "#/$defs/ExposureEvidence"

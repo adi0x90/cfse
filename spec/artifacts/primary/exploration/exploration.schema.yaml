@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://cfse.dev/schemas/artifacts/exploration.schema.yaml"
+$id: "https://cfse.ai/schemas/artifacts/exploration.schema.yaml"
 title: "CFSE Exploration Artifact Schema"
 description: |
   Schema for Exploration artifacts - concrete security experiments.
@@ -26,7 +26,7 @@ required:
 
 properties:
   id:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ExplorationID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ExplorationID"
     description: |
       Unique identifier following pattern E-<SYSTEM>-<NAME>-<NNN>-<VV>.
       The final segment versions the exploration for the same scenario.
@@ -44,10 +44,10 @@ properties:
 
   scenario_ref:
     oneOf:
-      - $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ScenarioID"
+      - $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ScenarioID"
       - type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ScenarioID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ScenarioID"
         minItems: 1
     description: |
       Reference to the Scenario(s) being tested. Usually a single scenario,
@@ -135,7 +135,7 @@ properties:
       Optional teardown instructions to reset state after exploration.
 
   status:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
     default: "DRAFT"
     description: |
       Lifecycle status of this exploration artifact.
@@ -147,7 +147,7 @@ properties:
       Semantic version of this exploration definition.
 
   extensions:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Extensions"
     description: |
       Optional extension-specific fields. Extensions MUST be declared by the
       corpus to be validated. See foundations/extensions.md.
@@ -239,7 +239,7 @@ $defs:
         type: string
         description: "What this step does"
       interaction:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InteractionID"
         description: "Referenced interaction"
       command:
         type: string
@@ -347,7 +347,7 @@ $defs:
       - expected_state
     properties:
       invariant:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
         description: "Invariant ID"
       expected_state:
         type: string
@@ -467,7 +467,7 @@ $defs:
       - state
     properties:
       invariant:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
         description: "Invariant ID"
       state:
         type: string
@@ -509,7 +509,7 @@ $defs:
           - LOW
         description: "Confidence level in verdict"
       finding_ref:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/FindingID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/FindingID"
         description: "Finding ID if violation confirmed"
       recommendations:
         type: array
@@ -559,15 +559,15 @@ $defs:
     type: object
     properties:
       baseline:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/TraceID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/TraceID"
         description: "Trace for the baseline (legitimate) path"
       attack:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/TraceID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/TraceID"
         description: "Trace for the attack (manipulated) path"
       additional:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/TraceID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/TraceID"
         uniqueItems: true
         description: "Any additional traces (retries, alternate windows, etc.)"
     additionalProperties: false

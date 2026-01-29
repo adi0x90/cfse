@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://cfse.dev/schemas/artifacts/invariant_library.schema.yaml"
+$id: "https://cfse.ai/schemas/artifacts/invariant_library.schema.yaml"
 title: "CFSE Invariant Library Schema"
 description: |
   Schema for Invariant Library YAML files - a canonical packaging format
@@ -34,7 +34,7 @@ properties:
     type: array
     minItems: 0
     items:
-      $ref: "https://cfse.dev/schemas/artifacts/predicate.schema.yaml"
+      $ref: "https://cfse.ai/schemas/artifacts/predicate.schema.yaml"
     description: |
       Predicate objects (P-*) defined in this library. Each entry must conform
       to the Predicate artifact schema.
@@ -43,7 +43,7 @@ properties:
     type: array
     minItems: 0
     items:
-      $ref: "https://cfse.dev/schemas/artifacts/invariant.schema.yaml"
+      $ref: "https://cfse.ai/schemas/artifacts/invariant.schema.yaml"
     description: |
       Invariant objects (INV-*) defined in this library. Each entry must conform
       to the Invariant artifact schema.

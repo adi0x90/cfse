@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://cfse.dev/schemas/artifacts/invariant.schema.yaml"
+$id: "https://cfse.ai/schemas/artifacts/invariant.schema.yaml"
 title: "CFSE Invariant Artifact Schema"
 description: |
   Schema for Invariant artifacts - the heart of CFSE security logic.
@@ -19,7 +19,7 @@ required:
 
 properties:
   id:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
     description: |
       Unique identifier for the invariant following the pattern INV-<SYSTEM>-<NAME>.
       Example: INV-SHOP-OWNER-DELETE, INV-AWS-NO-PUBLIC-S3, INV-K8S-POD-SECURITY
@@ -52,7 +52,7 @@ properties:
   predicates:
     type: array
     items:
-      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/PredicateID"
+      $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/PredicateID"
     minItems: 1
     uniqueItems: true
     description: |
@@ -60,7 +60,7 @@ properties:
       referenced in the logic field must be listed here for traceability.
 
   criticality:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Criticality"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Criticality"
     description: |
       Priority level indicating severity if this invariant is violated:
       - P0: Critical - Immediate action required (< 24 hours)
@@ -81,7 +81,7 @@ properties:
   dependencies:
     type: array
     items:
-      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+      $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
     uniqueItems: true
     description: |
       Other invariant IDs that this invariant depends on or assumes.
@@ -104,7 +104,7 @@ properties:
       backward compatibility and update references.
 
   status:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
     default: "DRAFT"
     description: |
       Lifecycle status of this invariant. Use DRAFT for work in progress,
@@ -112,7 +112,7 @@ properties:
       being phased out.
 
   extensions:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Extensions"
     description: |
       Optional extension-specific fields. Extensions MUST be declared by the
       corpus to be validated. See foundations/extensions.md.

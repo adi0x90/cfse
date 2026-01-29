@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://cfse.dev/schemas/artifacts/predicate.schema.yaml"
+$id: "https://cfse.ai/schemas/artifacts/predicate.schema.yaml"
 title: "CFSE Predicate Artifact Schema"
 description: |
   Schema for Predicate artifacts - atomic boolean conditions that form the
@@ -17,7 +17,7 @@ required:
 
 properties:
   id:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/PredicateID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/PredicateID"
     description: |
       Unique identifier for the predicate following the pattern P-<SYSTEM>-<NAME>.
       Example: P-SHOP-IS-OWNER, P-AWS-HAS-MFA, P-K8S-IS-PRIVILEGED
@@ -88,14 +88,14 @@ properties:
   used_in:
     type: array
     items:
-      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+      $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
     uniqueItems: true
     description: |
       List of invariant IDs that use this predicate. Maintained for
       reverse traceability - shows impact of predicate changes.
 
   negation:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/PredicateID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/PredicateID"
     description: |
       ID of the predicate that represents the logical negation. For example,
       P-SHOP-IS-OWNER might have negation P-SHOP-NOT-OWNER. Not required
@@ -104,14 +104,14 @@ properties:
   related:
     type: array
     items:
-      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/PredicateID"
+      $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/PredicateID"
     uniqueItems: true
     description: |
       Related predicates that are often used together or address similar
       concerns. Helps with discovery and completeness checking.
 
   status:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
     default: "DRAFT"
     description: |
       Lifecycle status of this predicate. Use DRAFT for work in progress,
@@ -119,7 +119,7 @@ properties:
       phased out.
 
   extensions:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Extensions"
     description: |
       Optional extension-specific fields. Extensions MUST be declared by the
       corpus to be validated. See foundations/extensions.md.
@@ -141,7 +141,7 @@ $defs:
         description: "Parameter name in snake_case"
       type:
         oneOf:
-          - $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+          - $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ConceptID"
           - $ref: "#/$defs/PrimitiveType"
         description: |
           Parameter type - either a Concept ID (C-*) or primitive type.
@@ -152,7 +152,7 @@ $defs:
       constraints:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Constraint"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Constraint"
         description: "Validation constraints for the parameter"
     additionalProperties: false
 

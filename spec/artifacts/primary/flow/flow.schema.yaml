@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://cfse.dev/schemas/artifacts/flow.schema.yaml"
+$id: "https://cfse.ai/schemas/artifacts/flow.schema.yaml"
 title: "CFSE Flow Artifact Schema"
 description: |
   Schema for Flow artifacts - multi-step legitimate sequences.
@@ -21,7 +21,7 @@ required:
 
 properties:
   id:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/FlowID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/FlowID"
     description: |
       Unique identifier for the flow following the pattern F-<SYSTEM>-<NAME>.
       Example: F-SHOP-CHECKOUT, F-AWS-CROSS-ACCOUNT, F-K8S-POD-DEPLOY
@@ -143,7 +143,7 @@ properties:
       outputs that prove the flow executed correctly.
 
   status:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
     default: "DRAFT"
     description: |
       Lifecycle status of this flow artifact.
@@ -158,7 +158,7 @@ properties:
       - "2.1.3"
 
   extensions:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Extensions"
     description: |
       Optional extension-specific fields. Extensions MUST be declared by the
       corpus to be validated. See foundations/extensions.md.
@@ -188,7 +188,7 @@ $defs:
         type: string
         description: "What specifically triggers the flow"
       entry_point:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InteractionID"
         description: "Initial interaction if triggered by API"
       event:
         type: string
@@ -215,10 +215,10 @@ $defs:
           - custom
         description: "Type of condition"
       invariant:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
         description: "Invariant reference (when type=invariant)"
       concept:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ConceptID"
         description: "Concept reference (when type=state or attribute)"
       state:
         type: string
@@ -254,7 +254,7 @@ $defs:
         type: string
         description: "Who performs this step"
       interaction:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InteractionID"
         description: "Reference to the interaction being executed"
       purpose:
         type: string
@@ -262,12 +262,12 @@ $defs:
       pre:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
         description: "Step-specific pre-invariants (may narrow flow preconditions)"
       post:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
         description: "Step-specific post-invariants (may extend flow postconditions)"
       conditional:
         type: string
@@ -286,7 +286,7 @@ $defs:
         default: "abort"
         description: "Failure handling strategy"
       compensation:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InteractionID"
         description: "Compensation interaction if step needs rollback"
       notes:
         type: string
@@ -337,7 +337,7 @@ $defs:
       - transitions
     properties:
       concept:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ConceptID"
         description: "Primary concept whose state is tracked"
       states:
         type: array
@@ -370,10 +370,10 @@ $defs:
         type: integer
         description: "Which flow step triggers this transition"
       interaction:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InteractionID"
         description: "Interaction that causes the transition"
       guard:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
         description: "Guard invariant for this transition"
     additionalProperties: false
 
@@ -385,22 +385,22 @@ $defs:
       concepts:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ConceptID"
         description: "Concepts involved in this flow"
       interactions:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InteractionID"
         description: "All interactions referenced by flow steps"
       scenarios:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ScenarioID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ScenarioID"
         description: "Scenarios that target this flow"
       explorations:
         type: array
         items:
-          $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ExplorationID"
+          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ExplorationID"
         description: "Explorations that execute this flow"
     additionalProperties: false
 

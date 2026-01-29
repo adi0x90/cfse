@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://cfse.dev/schemas/artifacts/scenario.schema.yaml"
+$id: "https://cfse.ai/schemas/artifacts/scenario.schema.yaml"
 title: "CFSE Scenario Artifact Schema"
 description: |
   Schema for Scenario artifacts - testable vulnerability hypotheses.
@@ -19,7 +19,7 @@ required:
 
 properties:
   id:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ScenarioID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ScenarioID"
     description: |
       Unique identifier for the scenario following pattern S-<SYSTEM>-<NAME>-<NNN>.
       Example: S-SHOP-IDOR-DELETE-001, S-AWS-PRIVILEGE-ESCALATION-003
@@ -73,7 +73,7 @@ properties:
     type: array
     minItems: 1
     items:
-      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+      $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
     uniqueItems: true
     description: |
       List of invariant IDs (INV-*) that this scenario attempts to violate.
@@ -82,7 +82,7 @@ properties:
   targeted_concepts:
     type: array
     items:
-      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ConceptID"
+      $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ConceptID"
     uniqueItems: true
     description: |
       Concepts involved in this scenario.
@@ -90,7 +90,7 @@ properties:
   targeted_interactions:
     type: array
     items:
-      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InteractionID"
+      $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InteractionID"
     uniqueItems: true
     description: |
       Specific interactions being manipulated or targeted.
@@ -134,7 +134,7 @@ properties:
       Additional context, references, or considerations.
 
   status:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
     default: "DRAFT"
     description: |
       Lifecycle status of this scenario artifact.
@@ -146,7 +146,7 @@ properties:
       Semantic version of this scenario definition.
 
   extensions:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Extensions"
     description: |
       Optional extension-specific fields. Extensions MUST be declared by the
       corpus to be validated. See foundations/extensions.md.
@@ -162,7 +162,7 @@ $defs:
       - flow
     properties:
       flow:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/FlowID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/FlowID"
         description: "The flow ID"
       steps:
         type: array
@@ -297,7 +297,7 @@ $defs:
       - invariant
     properties:
       invariant:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/InvariantID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/InvariantID"
         description: "Invariant that should reject the attempt"
       at:
         type: string
@@ -348,7 +348,7 @@ $defs:
       - id
     properties:
       id:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/GeneratorID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/GeneratorID"
         description: "Generator ID"
       name:
         type: string
@@ -387,6 +387,6 @@ $defs:
           type: string
         description: "Concrete evidence from testing"
       exploration_ref:
-        $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ExplorationID"
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ExplorationID"
         description: "Link to the exploration that tested this scenario"
     additionalProperties: false

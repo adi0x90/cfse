@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://cfse.dev/schemas/artifacts/generator.schema.yaml"
+$id: "https://cfse.ai/schemas/artifacts/generator.schema.yaml"
 title: "CFSE Generator Artifact Schema"
 description: |
   Schema for Generator artifacts - reusable patterns for creating scenarios.
@@ -17,7 +17,7 @@ required:
 
 properties:
   id:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/GeneratorID"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/GeneratorID"
     description: |
       Unique identifier for the generator following the pattern GEN-<STRATEGY>-<NNN>.
       Example: GEN-BOUNDARY-001, GEN-MUTATION-FUZZ-042, GEN-IDOR-003
@@ -94,14 +94,14 @@ properties:
   related:
     type: array
     items:
-      $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/GeneratorID"
+      $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/GeneratorID"
     uniqueItems: true
     description: |
       Related generators that address similar concerns or can be used
       together for comprehensive testing.
 
   status:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactStatus"
     default: "DRAFT"
     description: |
       Lifecycle status of this generator. Use DRAFT for work in progress,
@@ -109,7 +109,7 @@ properties:
       phased out.
 
   extensions:
-    $ref: "https://cfse.dev/schemas/grammar.schema.yaml#/$defs/Extensions"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Extensions"
     description: |
       Optional extension-specific fields. Extensions MUST be declared by the
       corpus to be validated. See foundations/extensions.md.
