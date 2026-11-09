@@ -1,8 +1,8 @@
 # CFSE - Concept Flow Scenarios Explorations
 
-**Version 1.0.0** | January 2026
+**Version 2.0.0** | November 2026
 
-The released version remains 1.0.0. This working tree contains an **unreleased breaking contract repair** intended for the next major release. See the [proposal](rfcs/PROPOSAL-CONTRACT-REPAIR.md), [migration guide](guides/migrations/contract-repair.md), and [validation instructions](tests/README.md). Pin a release or commit when validating existing corpora.
+CFSE 2.0.0 includes breaking contract repairs. Before upgrading a corpus or tool, read the [migration guide](guides/migrations/contract-repair.md), [changelog](spec/changelog.md), and [validation instructions](tests/README.md). Pin the `v2.0.0` tag or an exact commit when validating corpora.
 
 > **CFSE is a formal methodology for security epistemology: a disciplined approach to replacing intuition with structure, and claims with evidence.**
 

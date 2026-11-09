@@ -1,6 +1,6 @@
-# Migrating to the unreleased contract repair
+# Migrating from CFSE 1.x to 2.0.0
 
-This informative guide describes the breaking changes proposed for the next major CFSE release. The normative requirements are in `spec/`. `VERSION` still identifies the last released version; no new release or corpus migration is implied by this branch.
+This informative guide describes the breaking contract changes in CFSE 2.0.0. The normative requirements are in `spec/` at tag `v2.0.0`. Upgrading a validator or schema set does not automatically migrate existing corpora.
 
 Pin the specification revision used by your tools, inventory existing records, and review validation failures before adopting the new contract. Preserve the original records and their provenance.
 
@@ -27,4 +27,4 @@ The Flow example's invalid `I-SHOP-COLLECT-GUEST-INFO-001` identifier is correct
 
 Run the [contract tests](../../tests/README.md) against the exact schema revision you intend to adopt. Schema checks validate representation and local record requirements; a semantic validator is needed for logic, cross-references and cross-artifact consistency. Direct evidence and approval still require researcher review. Passing the provided tests does not establish full CFSE conformance.
 
-The [release process](../../RELEASING.md) requires a major version for these breaking requirements. Update the version, release notes and corpus declarations when that release is actually cut.
+After reviewing and migrating a corpus, update its `cfse.version` declaration to `"2.0.0"` only when it satisfies the applicable requirements. Per-artifact `version` fields describe the artifacts themselves and do not need to become `2.0.0` merely because the specification changed. Keep older corpora pinned to their original specification revision until migration is complete.
