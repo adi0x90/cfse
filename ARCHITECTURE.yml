@@ -4,12 +4,12 @@
 # Designed for LLM consumption - provides explicit artifact relationships,
 # file locations, and cross-reference patterns.
 #
-# Version: 1.0.0
-# Last Updated: 2026-01-26
+# Version: 2.0.0
+# Last Updated: 2026-11-09
 
 cfse:
   name: "Concept Flow Scenarios Explorations"
-  version: "1.0.0"
+  version: "2.0.0"
   tagline: >
     A formal methodology for security epistemology: replacing intuition with structure,
     and claims with evidence.
@@ -81,7 +81,7 @@ cfse:
         methodology: "4V Cycle (Verify, Validate, Vaccinate, Valuate)"
 
   # ==========================================================================
-  # DIRECTORY STRUCTURE (v1.0.0)
+  # DIRECTORY STRUCTURE (v2.0.0)
   # ==========================================================================
   # The new structure uses spec/ (singular) as the normative source of truth.
 
@@ -326,21 +326,27 @@ cfse:
   # ==========================================================================
 
   migration:
-    from_version: "pre-1.0"
-    to_version: "1.0.0"
-    date: "2026-01-25"
+    from_version: "1.x"
+    to_version: "2.0.0"
+    date: "2026-11-09"
+    guide: "guides/migrations/contract-repair.md"
     changes:
-      - "Consolidated numbered directories (1-framework, 2-concepts, etc.) into spec/"
-      - "Introduced foundations/, grammar/, artifacts/, semantics/ structure"
-      - "Added YAML schemas for all artifact types"
-      - "Separated normative spec from informative materials (published separately)"
-      - "Created machine-readable ARCHITECTURE.yml manifest"
+      - "Require exactly one Scenario reference per Exploration"
+      - "Align lifecycle metadata and outcome-dependent evidence records"
+      - "Separate schema checks, semantic validation and evidence authenticity"
+      - "Require explicit review of existing corpora without inventing approval or evidence"
 
   # ==========================================================================
   # VERSION HISTORY
   # ==========================================================================
 
   version_history:
+    - version: "2.0.0"
+      date: "2026-11-09"
+      changes:
+        - "Repair lifecycle, Exploration, evidence and logic-validation contracts"
+        - "Add synthetic conformance vectors and public schema CI"
+        - "Document migration from 1.x and static-validation limits"
     - version: "1.0.0"
       date: "2026-01-25"
       changes:

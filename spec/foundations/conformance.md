@@ -83,7 +83,7 @@ A CFSE implementation SHOULD declare its conformance level:
 
 ```yaml
 cfse:
-  version: "1.0.0"
+  version: "2.0.0"
   conformance: "standard"  # minimal | standard | full
 ```
 
@@ -97,7 +97,7 @@ Example:
 
 ```yaml
 cfse:
-  version: "1.0.0"
+  version: "2.0.0"
   conformance: "standard"
   extensions:
     example_ext:
@@ -111,7 +111,7 @@ An implementation that meets some but not all requirements of a level is conside
 
 ```yaml
 cfse:
-  version: "1.0.0"
+  version: "2.0.0"
   conformance: "partial"
   level: "standard"
   missing:
