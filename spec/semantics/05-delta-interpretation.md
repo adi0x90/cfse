@@ -205,7 +205,7 @@ A delta is significant when it demonstrates protection:
 
 | Indicator | BASE | ATT | Interpretation |
 |-----------|------|-----|----------------|
-| Status Code | 200 | 403/401 | Access denied |
+| Status Code | 200 | 403/401 | Reported denial; protected effects still need verification |
 | Resource | Modified | Unchanged | Protected |
 | Side Effects | Triggered | Not triggered | Blocked |
 | Audit Log | Success entry | Failure entry | Logged attempt |
@@ -225,11 +225,11 @@ CONCLUSION: Delta is significant. Invariant HOLDS.
 
 ### Insignificant Delta (Invariant Violated)
 
-A delta is insignificant when BASE and ATT behave identically:
+A small delta supports a violation only when direct evidence shows that ATT achieved an unauthorized protected effect. Identical response metadata alone is insufficient:
 
 | Indicator | BASE | ATT | Interpretation |
 |-----------|------|-----|----------------|
-| Status Code | 200 | 200 | Both succeeded |
+| Status Code | 200 | 200 | Both reported success; effects still need verification |
 | Resource | Modified | Modified | No protection |
 | Side Effects | Triggered | Triggered | Bypass occurred |
 | Audit Log | Success | Success | Not distinguished |
@@ -252,6 +252,8 @@ CONCLUSION: Delta is insignificant. Invariant VIOLATED. VULNERABILITY FOUND.
 ## Delta Interpretation Matrix
 
 ### Decision Logic
+
+Here, success and rejection mean verified property-specific effects, not HTTP status classes. These examples concern state mutation; confidentiality and timing invariants require their own observations.
 
 ```
 +-----------------+------------------+------------------+
@@ -297,9 +299,9 @@ Signal is variation that indicates security state:
 
 | Signal Type | Example | Interpretation |
 |-------------|---------|----------------|
-| Status code class | 2xx vs 4xx | Authorization decision |
+| Status code class | 2xx vs 4xx | Supporting signal; not a demonstrated authorization decision |
 | Resource state | Exists vs deleted | Protection effectiveness |
-| Permission errors | "Forbidden" message | Access control working |
+| Permission errors | "Forbidden" message | Reported denial; verify the protected effect |
 | Audit entries | "denied" vs "allowed" | Security logging |
 | Side effect presence | Email sent vs not sent | Flow control |
 
@@ -417,67 +419,36 @@ idempotency_delta:
 
 ## Validation Rules
 
-### Schema Compliance
+### Schema Reference
+
+The authoritative schema for `DeltaAnalysis` is defined in [`exploration.schema.yaml`](../artifacts/primary/exploration/exploration.schema.yaml). A structural excerpt is shown below; the linked schema also applies outcome-dependent constraints:
 
 ```yaml
 DeltaAnalysis:
   type: object
-  required: [baseline, attack, measurements, conclusion]
+  required: [summary]
   properties:
-    baseline:
-      type: object
-      required: [steps, outcome]
-      properties:
-        steps:
-          type: array
-          items:
-            $ref: "#/$defs/ExecutionStep"
-        outcome:
-          type: string
-          enum: [success, failure]
-        observations:
-          type: object
-    attack:
-      type: object
-      required: [manipulation, steps, outcome]
-      properties:
-        manipulation:
-          type: string
-          enum: [skip_step, reorder, mutate_param, set_state, fault_injection, timing]
-        steps:
-          type: array
-          items:
-            $ref: "#/$defs/ExecutionStep"
-        outcome:
-          type: string
-          enum: [success, failure, error]
-        observations:
-          type: object
-    measurements:
+    summary:
+      $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/NonBlankString"
+      description: "High-level summary of the delta"
+    differences:
       type: array
       items:
-        $ref: "#/$defs/DeltaMeasurement"
-      minItems: 1
-    conclusion:
-      type: object
-      required: [delta_significant, invariant_state]
-      properties:
-        delta_significant:
-          type: boolean
-        invariant_state:
-          type: string
-          enum: [HOLDS, VIOLATED, UNKNOWN]
+        $ref: "#/$defs/Difference"   # {aspect, baseline, attack, significance}
+    invariant_states:
+      type: array
+      items:
+        $ref: "#/$defs/InvariantResult"  # {invariant, state, evidence}
+  additionalProperties: false
 ```
+
+The measurement guidance in this document (measurement points, weights, noise vs signal) describes the **analytical method** for computing delta, not additional schema fields. Use `differences[]` to record measurements and `invariant_states[]` to record the resulting invariant evaluations.
 
 ### Consistency Checks
 
-Validators MUST enforce:
+Validators MUST check the confirmed-outcome record requirements: successful BASE, nonempty ATT results, timestamp, environment, nonblank summaries, targeted invariant states, and nonblank evidence for decisive states. Reference and verdict consistency checks apply across the corpus.
 
-1. BASE MUST have outcome: success for valid delta
-2. ATT manipulation MUST be documented
-3. At least one measurement point MUST be recorded
-4. conclusion MUST align with measurements
-5. VIOLATED conclusion MUST have evidence of state modification
+Researchers MUST additionally verify that BASE and ATT are matched, that ATT's manipulation occurred, and that the direct evidence supports each invariant state. Static validation of a text field does not authenticate evidence or establish its meaning. Tools that do not perform these semantic checks MUST report them as not checked, not passed.
 
 ---
 

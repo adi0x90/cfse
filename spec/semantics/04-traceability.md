@@ -93,24 +93,30 @@ Findings represent confirmed vulnerabilities. They MUST be supported by reproduc
 ### Validation
 
 ```yaml
-# Valid: Single exploration reference
+# Valid fragments: traceability.exploration can identify a primary exploration.
 finding:
   id: FD-OJS-AUTHZ-001
-  exploration_refs:
-    - E-OJS-PAYMENT-BYPASS-001-01
+  traceability:
+    exploration: E-OJS-PAYMENT-BYPASS-001-01
+    scenario: S-OJS-PAYMENT-BYPASS-001
 
-# Valid: Multiple exploration references
+# Exploration evidence entries can also supply one or more references.
 finding:
   id: FD-OJS-AUTHZ-002
-  exploration_refs:
-    - E-OJS-IDOR-001-01
-    - E-OJS-IDOR-001-02
-    - E-OJS-IDOR-002-01
+  traceability:
+    exploration: E-OJS-IDOR-001-01
+    scenario: S-OJS-IDOR-001
+  evidence:
+    - type: exploration
+      reference: E-OJS-IDOR-001-01
+      description: "First supporting execution"
+    - type: exploration
+      reference: E-OJS-IDOR-001-02
+      description: "Second supporting execution"
 
-# INVALID: No exploration reference
+# INVALID: Neither traceability nor evidence identifies an exploration.
 finding:
   id: FD-OJS-AUTHZ-003
-  # Missing exploration_refs - VIOLATION OF TR-1
 ```
 
 ### When Traceability Breaks
@@ -118,7 +124,7 @@ finding:
 If TR-1 is violated:
 
 1. The Finding MUST NOT be considered valid
-2. The Finding MUST be marked as `draft` status
+2. The Finding MUST be marked as `DRAFT` status
 3. An exploration MUST be created to substantiate the claim
 4. Automated validators MUST reject the Finding
 
@@ -285,7 +291,10 @@ invariant:
 # Valid: Predicate with logical operators
 invariant:
   id: INV-FILE-ACCESS
-  expression: "P-FILE-EXISTS AND (P-USER-IS-OWNER OR P-USER-HAS-SHARE)"
+  logic: >
+    FORALL user: C-USER-ACCOUNT. FORALL file: C-FILE-OBJECT.
+      P-FILE-EXISTS(file) AND
+      (P-USER-IS-OWNER(user, file) OR P-USER-HAS-SHARE(user, file))
   predicates:
     - P-FILE-EXISTS
     - P-USER-IS-OWNER

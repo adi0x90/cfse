@@ -27,6 +27,9 @@ Scenarios are the bridge between the world model (concepts, interactions, flows,
 
 ## Optional Fields
 
+This artifact accepts the [shared lifecycle metadata](../../../semantics/03-artifact-lifecycle.md#shared-lifecycle-fields). `ACTIVE` requires `version` and `approved`; `DEPRECATED` requires `deprecated_date`.
+
+
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `question` | string | - | Natural language question the scenario answers |
@@ -276,6 +279,7 @@ notes: >
   will succeed.
 
 status: ACTIVE
+approved: "2025-01-15"
 version: "1.0.0"
 ```
 

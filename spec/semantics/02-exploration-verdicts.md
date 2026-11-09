@@ -25,7 +25,7 @@ Explorations record their final outcome in `verdict`, using `verdict.result` to 
 
 ### Definition
 
-`VIOLATION_CONFIRMED` indicates that ATT succeeded in a way that demonstrates a security violation (insufficient delta relative to BASE), and at least one targeted invariant is observed as `VIOLATED`.
+`VIOLATION_CONFIRMED` indicates that ATT succeeded in a way that demonstrates a security violation established by direct property-specific evidence relative to BASE, and at least one targeted invariant is observed as `VIOLATED`.
 
 ### Requirements
 
@@ -33,7 +33,8 @@ When `verdict.result` is `VIOLATION_CONFIRMED`:
 
 1. A Finding MUST be created.
 2. The Finding MUST reference the exploration (TR-1).
-3. The exploration SHOULD set `verdict.finding_ref` to the created Finding ID.
+3. The exploration SHOULD set `verdict.finding_ref` to the created Finding ID. If supplied, it MUST resolve to a Finding referencing this exploration.
+4. The Finding's violated invariants MUST be targeted by the Scenario and recorded as `VIOLATED` in this exploration.
 
 ### Example
 
@@ -58,7 +59,7 @@ verdict:
 When `verdict.result` is `ENFORCEMENT_CONFIRMED`:
 
 1. A Finding MUST NOT be created.
-2. The exploration SHOULD include evidence in `observations.delta.invariant_states[]` and/or other observation fields.
+2. The exploration MUST record every targeted invariant exactly once as `HOLDS`, with nonblank direct-evidence descriptions in `observations.delta.invariant_states[]`.
 
 ### Example
 
@@ -82,7 +83,8 @@ verdict:
 When `verdict.result` is `INCONCLUSIVE`:
 
 1. A Finding MUST NOT be created from this exploration alone.
-2. The exploration SHOULD include next steps in `verdict.recommendations[]`.
+2. `observations.executed_at` and a nonblank `verdict.summary` MUST record the execution and uncertainty.
+3. The exploration SHOULD include next steps in `verdict.recommendations[]`.
 
 ---
 
@@ -97,16 +99,23 @@ When `verdict.result` is `INCONCLUSIVE`:
 When `verdict.result` is `BLOCKED`:
 
 1. A Finding MUST NOT be created.
-2. The blocking reason SHOULD be recorded (commonly in `verdict.summary` and/or `observations.environment`).
+2. The blocking reason MUST be recorded in a nonblank `verdict.summary`.
+3. `observations` MUST be empty; if execution occurred, use `INCONCLUSIVE` for an unresolved outcome.
 
 ---
+
+## Shared record requirements
+
+Both confirmed verdicts require a timestamp, environment, successful matched BASE, nonempty ATT results, a nonblank delta summary and verdict summary, and recorded targeted invariant states. Decisive states require nonblank evidence. Duplicate or unrelated invariant observations are invalid. See [Exploration record requirements](../artifacts/primary/exploration/exploration.md#record-requirements-by-outcome).
+
+An unexecuted `DRAFT` or `PLANNED` exploration MAY omit `verdict` with `observations: {}`. Other lifecycle states require a verdict. A supplied verdict always carries its requirements, regardless of lifecycle status.
 
 ## Aggregation Guidance
 
 When deciding a verdict from invariant observations:
 
 - If ANY targeted invariant is observed as `VIOLATED`, prefer `VIOLATION_CONFIRMED`.
-- Else if targeted invariants are observed as `HOLDS` and the delta matches expectations, prefer `ENFORCEMENT_CONFIRMED`.
+- Else if EVERY targeted invariant is observed as `HOLDS` and the delta matches expectations, prefer `ENFORCEMENT_CONFIRMED`.
 - Else prefer `INCONCLUSIVE`.
 
 Use `BLOCKED` when execution itself was not possible.

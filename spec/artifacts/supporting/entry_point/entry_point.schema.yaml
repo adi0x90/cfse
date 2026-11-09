@@ -120,13 +120,24 @@ properties:
     default: "DRAFT"
 
   version:
-    type: string
-    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactVersion"
 
   extensions:
     $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/Extensions"
 
+  approved:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/LifecycleDate
+  deprecated_date:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/LifecycleDate
+  superseded_by:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactID
+  deprecation_reason:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/NonBlankString
+
 additionalProperties: false
+
+allOf:
+  - $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactLifecycle"
 
 $defs:
   ExposureMode:

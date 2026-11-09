@@ -24,6 +24,9 @@ Instead of manually creating each scenario, security engineers define generators
 
 ## Optional Fields
 
+This artifact accepts the [shared lifecycle metadata](../../../semantics/03-artifact-lifecycle.md#shared-lifecycle-fields). `ACTIVE` requires `version` and `approved`; `DEPRECATED` requires `deprecated_date`.
+
+
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `description` | string | - | Detailed description and usage guidance |
@@ -232,6 +235,8 @@ related:
   - GEN-AUTHZ-001 # General authorization bypass
 
 status: ACTIVE
+version: "1.0.0"
+approved: "2025-01-15"
 ```
 
 ---
@@ -312,6 +317,8 @@ outputs:
   - scenario
 
 status: ACTIVE
+version: "1.0.0"
+approved: "2025-01-15"
 ```
 
 ---

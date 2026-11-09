@@ -6,7 +6,7 @@ An **Exploration** is a concrete, reproducible security experiment that tests a 
 
 Explorations transform theoretical scenarios into empirical evidence. They answer: "What actually happens when we try this attack?"
 
-**Key principle:** Delta Analysis is the heart of exploration. By comparing baseline and attack paths side-by-side, we definitively determine whether security controls work as expected.
+**Key principle:** Delta Analysis is the heart of exploration. By comparing baseline and attack paths side-by-side, we assess whether the targeted controls worked in the observed execution.
 
 **Schema:** [`exploration.schema.yaml`](./exploration.schema.yaml)
 
@@ -18,7 +18,7 @@ Explorations transform theoretical scenarios into empirical evidence. They answe
 |-------|------|-------------|
 | `id` | ExplorationID | Unique identifier `E-<SYSTEM>-<NAME>-<NNN>-<VV>` |
 | `title` | string | Descriptive name of the experiment |
-| `scenario_ref` | ScenarioID | Reference to the Scenario being tested |
+| `scenario_ref` | ScenarioID | Exactly one Scenario ID; arrays are invalid (TR-2) |
 | `objective` | string | What the experiment aims to confirm/refute |
 | `base_setup` | PathSetup | Setup for baseline (legitimate) path |
 | `base_action` | PathAction | Steps executed in baseline path |
@@ -27,11 +27,13 @@ Explorations transform theoretical scenarios into empirical evidence. They answe
 | `att_action` | PathAction | Steps executed in attack path |
 | `att_expected` | PathExpected | Expected observations for attack |
 | `observations` | Observations | Actual results from execution |
-| `verdict` | ExplorationVerdict | Final determination (`VIOLATION_CONFIRMED`, `ENFORCEMENT_CONFIRMED`, `INCONCLUSIVE`, or `BLOCKED`) |
+| `verdict` | ExplorationVerdict | Required after execution or when blocked; omitted only for an unexecuted `DRAFT` or `PLANNED` record |
 
 ---
 
 ## Optional Fields
+
+This artifact accepts the [shared lifecycle metadata](../../../semantics/03-artifact-lifecycle.md#shared-lifecycle-fields). `ACTIVE` requires `version` and `approved`; `DEPRECATED` requires `deprecated_date`.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -65,14 +67,14 @@ The manipulated path where invariants should **block** (or be violated):
 
 ### Delta Comparison
 
-| Aspect | Baseline | Attack | Indicates |
-|--------|----------|--------|-----------|
-| Status Code | 200 OK | 403 Forbidden | **Enforced** - attack blocked |
-| Status Code | 200 OK | 200 OK | **Violated** - attack succeeded |
-| Resource State | Modified by owner | Unchanged | **Enforced** |
-| Resource State | Modified by owner | Modified by attacker | **Violated** |
-| Logs | "user.deleted_own_item" | "unauthorized_delete_attempt" | **Enforced** |
-| Logs | "user.deleted_own_item" | "user.deleted_own_item" | **Violated** (if attacker) |
+HTTP status codes describe responses, not security outcomes. A `200` does not establish unauthorized effects; a `403` does not establish that protected effects were prevented. Compare the property-specific evidence: persisted state, returned protected data, effects, or linked Trace steps.
+
+| Observation | What it supports |
+|-------------|------------------|
+| BASE 200, ATT 403 | A reported denial; confirm the protected property before marking `HOLDS` |
+| BASE 200, ATT 200 | A reported success; confirm an unauthorized effect before marking `VIOLATED` |
+| Authorized deletion observed; unauthorized attempt leaves the item intact | `HOLDS` for the tested deletion property |
+| Unauthorized deletion independently observed after ATT | `VIOLATED` for the tested deletion property |
 
 ---
 
@@ -191,8 +193,23 @@ observations:
     invariant_states:
       - invariant: INV-SHOP-OWNER-DELETE
         state: VIOLATED
-        evidence: "Bob deleted Alice's item with 200 OK"
+        evidence: "Owner-side read after Bob's request confirmed item-123 was absent; the matched fixture existed before ATT."
 ```
+
+### Record requirements by outcome
+
+The required `observations` object is empty for an unexecuted draft/plan or a `BLOCKED` experiment. An omitted status means `DRAFT`. A supplied verdict is validated regardless of status; setting `DRAFT` never waives evidence requirements.
+
+| Record | Required content |
+|--------|------------------|
+| Unexecuted `DRAFT` / `PLANNED` | `observations: {}`; omit `verdict` |
+| `BLOCKED` | `observations: {}` and a nonblank `verdict.summary` explaining the blocker |
+| `INCONCLUSIVE` | `observations.executed_at` and a nonblank `verdict.summary` explaining the uncertainty |
+| Either confirmed verdict | Execution timestamp, nonblank environment, BASE results with `success: true`, nonempty ATT results, delta with nonblank summary and nonempty invariant states, and a nonblank verdict summary |
+
+Every recorded invariant MUST belong to the referenced Scenario's `targeted_invariants`, and each invariant MUST appear at most once. Every `HOLDS` or `VIOLATED` record MUST contain nonblank `evidence` describing direct observations or identifying linked Trace evidence. `VIOLATION_CONFIRMED` requires at least one targeted `VIOLATED` invariant and a referencing Finding. `ENFORCEMENT_CONFIRMED` requires every targeted invariant recorded as `HOLDS`.
+
+The validator checks the record structure and cross-artifact consistency. It does not authenticate evidence, execute the experiment, or prove that prose supports a claim. The researcher must assess those separately. An insufficiently supported result remains `INCONCLUSIVE` / `UNKNOWN`.
 
 ### trace_refs (optional)
 
@@ -236,6 +253,8 @@ verdict:
 - **Always run both paths.** Without baseline, you can't confirm the attack path is actually different behavior.
 
 - **Same environment.** Both paths must execute in identical conditions to make delta meaningful.
+
+- **Matched operations.** BASE MUST exercise the same security-sensitive operation as ATT under legitimate conditions. A pre-state read is setup or verification, not a baseline for a mutation. Only the intended manipulation should differ between BASE and ATT.
 
 - **Concrete commands.** Use actual curl/httpie commands that can be copy-pasted and reproduced.
 
@@ -493,6 +512,7 @@ cleanup:
   automated: true
 
 status: ACTIVE
+approved: "2025-01-15"
 version: "1.0.0"
 ```
 

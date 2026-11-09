@@ -22,7 +22,6 @@ required:
   - att_action
   - att_expected
   - observations
-  - verdict
 
 properties:
   id:
@@ -43,15 +42,8 @@ properties:
       - "Payment Bypass: Skip Checkout Step 3"
 
   scenario_ref:
-    oneOf:
-      - $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ScenarioID"
-      - type: array
-        items:
-          $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ScenarioID"
-        minItems: 1
-    description: |
-      Reference to the Scenario(s) being tested. Usually a single scenario,
-      but may reference multiple related scenarios.
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ScenarioID"
+    description: "Exactly one Scenario tested by this exploration (TR-2)."
 
   objective:
     type: string
@@ -141,8 +133,7 @@ properties:
       Lifecycle status of this exploration artifact.
 
   version:
-    type: string
-    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactVersion"
     description: |
       Semantic version of this exploration definition.
 
@@ -152,7 +143,148 @@ properties:
       Optional extension-specific fields. Extensions MUST be declared by the
       corpus to be validated. See foundations/extensions.md.
 
+  approved:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/LifecycleDate
+  deprecated_date:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/LifecycleDate
+  superseded_by:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactID
+  deprecation_reason:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/NonBlankString
+
 additionalProperties: false
+
+allOf:
+  - $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactLifecycle"
+
+  - if:
+      not:
+        required:
+        - verdict
+    then:
+      properties:
+        status:
+          enum:
+          - DRAFT
+          - PLANNED
+        observations:
+          maxProperties: 0
+  - if:
+      required:
+      - verdict
+      properties:
+        verdict:
+          required:
+          - result
+          properties:
+            result:
+              enum:
+              - BLOCKED
+    then:
+      properties:
+        observations:
+          maxProperties: 0
+  - if:
+      required:
+      - verdict
+      properties:
+        verdict:
+          required:
+          - result
+          properties:
+            result:
+              enum:
+              - INCONCLUSIVE
+    then:
+      properties:
+        observations:
+          required:
+          - executed_at
+  - if:
+      required:
+      - verdict
+      properties:
+        verdict:
+          required:
+          - result
+          properties:
+            result:
+              enum:
+              - VIOLATION_CONFIRMED
+              - ENFORCEMENT_CONFIRMED
+    then:
+      properties:
+        observations:
+          required:
+          - executed_at
+          - environment
+          - base_results
+          - att_results
+          - delta
+          properties:
+            environment:
+              $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/NonBlankString
+            base_results:
+              required:
+              - success
+              properties:
+                success:
+                  const: true
+            att_results:
+              minProperties: 1
+            delta:
+              required:
+              - invariant_states
+              properties:
+                invariant_states:
+                  minItems: 1
+                  uniqueItems: true
+  - if:
+      required:
+      - verdict
+      properties:
+        verdict:
+          required:
+          - result
+          properties:
+            result:
+              enum:
+              - VIOLATION_CONFIRMED
+    then:
+      properties:
+        observations:
+          properties:
+            delta:
+              properties:
+                invariant_states:
+                  contains:
+                    required:
+                    - state
+                    properties:
+                      state:
+                        const: VIOLATED
+  - if:
+      required:
+      - verdict
+      properties:
+        verdict:
+          required:
+          - result
+          properties:
+            result:
+              enum:
+              - ENFORCEMENT_CONFIRMED
+    then:
+      properties:
+        observations:
+          properties:
+            delta:
+              properties:
+                invariant_states:
+                  items:
+                    properties:
+                      state:
+                        const: HOLDS
 
 $defs:
   ExplorationSetup:
@@ -421,7 +553,7 @@ $defs:
       - summary
     properties:
       summary:
-        type: string
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/NonBlankString"
         description: "High-level summary of the delta"
       differences:
         type: array
@@ -480,6 +612,17 @@ $defs:
       evidence:
         type: string
         description: "Evidence for this determination"
+    allOf:
+      - if:
+          required: [state]
+          properties:
+            state:
+              enum: [HOLDS, VIOLATED]
+        then:
+          required: [evidence]
+          properties:
+            evidence:
+              $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/NonBlankString"
     additionalProperties: false
 
   ExplorationVerdict:
@@ -499,7 +642,7 @@ $defs:
           - BLOCKED
         description: "Overall result"
       summary:
-        type: string
+        $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/NonBlankString"
         description: "Summary of findings"
       confidence:
         type: string

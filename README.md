@@ -2,6 +2,8 @@
 
 **Version 1.0.0** | January 2026
 
+The released version remains 1.0.0. This working tree contains an **unreleased breaking contract repair** intended for the next major release. See the [proposal](rfcs/PROPOSAL-CONTRACT-REPAIR.md), [migration guide](guides/migrations/contract-repair.md), and [validation instructions](tests/README.md). Pin a release or commit when validating existing corpora.
+
 > **CFSE is a formal methodology for security epistemology: a disciplined approach to replacing intuition with structure, and claims with evidence.**
 
 CFSE is a formal methodology for security epistemology—a disciplined approach to *knowing* whether a system is secure, not guessing or hoping. It builds a world model of systems through concepts, interactions, and flows, expresses security properties as formal invariants with temporal logic, and validates claims through systematic exploration backed by structured evidence.

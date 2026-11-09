@@ -124,6 +124,23 @@ properties:
 
 additionalProperties: false
 
+allOf:
+- if:
+    required:
+    - status
+    properties:
+      status:
+        const: COMPLETE
+  then:
+    properties:
+      verification:
+        properties:
+          explorations_rerun:
+            items:
+              properties:
+                result_after:
+                  const: HOLDS
+
 $defs:
   FindingReference:
     title: "Finding Reference"

@@ -2,9 +2,24 @@
 
 ## Overview
 
-CFSE artifacts (Concepts, Interactions, Flows, Scenarios, Explorations, Traces, Findings, Invariants, Predicates, Patches) follow a defined lifecycle. This specification defines the lifecycle states and transition rules that govern artifact authority and usage.
+CFSE artifacts using `ArtifactStatus` follow the lifecycle below. Patches use their separate 4V `PatchStatus` workflow; Invariant Library containers carry the lifecycle on their individual entries. This specification defines the lifecycle states and transition rules that govern artifact authority and usage.
 
 ---
+
+## Shared lifecycle fields
+
+Every artifact with `ArtifactStatus` accepts the following top-level metadata. Omitted `status` means `DRAFT`; defaults are interpretations, not fields a validator silently inserts.
+
+| Field | Requirement |
+|-------|-------------|
+| `status` | Optional; one of the states below |
+| `version` | Required for `ACTIVE`; a `major.minor.patch` string with optional prerelease suffix |
+| `approved` | Required for `ACTIVE`; a quoted calendar date (`YYYY-MM-DD`) |
+| `deprecated_date` | Required for `DEPRECATED`; a quoted calendar date |
+| `superseded_by` | Optional ArtifactID; must resolve when supplied |
+| `deprecation_reason` | Optional nonblank explanation |
+
+Presence of an approval date is a record requirement, not proof that a review occurred. Dates must be real calendar dates. Quote dates in YAML so that serializers preserve string values. Other metadata fields are governed by the individual artifact schema; these examples show lifecycle fragments, not complete artifacts.
 
 ## State Definitions
 
@@ -63,8 +78,6 @@ An artifact SHOULD be marked `DRAFT` when ANY of the following conditions apply:
 id: C-AWS-LAMBDA-FUNCTION
 status: DRAFT
 version: 0.1.0
-created: 2025-01-15
-notes: "Initial concept definition; awaiting security review"
 ---
 ```
 
@@ -161,10 +174,7 @@ An artifact MUST be marked `ACTIVE` when ALL of the following conditions are met
 id: INV-FILE-OWNER-DELETE
 status: ACTIVE
 version: 1.0.0
-created: 2025-01-10
-approved: 2025-01-12
-approver: security-team
-notes: "Authoritative invariant for file ownership deletion checks"
+approved: "2025-01-12"
 ---
 ```
 
@@ -228,10 +238,9 @@ When deprecating an artifact:
 id: INV-LEGACY-AUTH-CHECK
 status: DEPRECATED
 version: 1.0.0
-deprecated_date: 2025-01-20
+deprecated_date: "2025-01-20"
 superseded_by: INV-MODERN-AUTH-CHECK
 deprecation_reason: "Legacy authentication flow replaced with OAuth 2.0"
-notes: "Maintain for historical reference only"
 ---
 ```
 
@@ -369,39 +378,13 @@ Review this checklist when managing lifecycle states:
 
 ### Schema Compliance
 
-```yaml
-ArtifactLifecycle:
-  type: object
-  required: [id, status]
-  properties:
-    id:
-      $ref: "#/$defs/ArtifactID"
-    status:
-      type: string
-      enum: [DRAFT, REVIEW, PLANNED, ACTIVE, DEPRECATED, ARCHIVED]
-    version:
-      type: string
-      pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+(-[a-z]+)?$"
-    created:
-      type: string
-      format: date
-    approved:
-      type: string
-      format: date
-    deprecated_date:
-      type: string
-      format: date
-    superseded_by:
-      $ref: "#/$defs/ArtifactID"
-    deprecation_reason:
-      type: string
-```
+Each artifact schema declares the shared metadata properties and applies the `ArtifactLifecycle` constraints from [the grammar schema](../grammar/schemas/grammar.schema.yaml). `status` is optional with interpreted default `DRAFT`; `ACTIVE` requires `version` and `approved`, and `DEPRECATED` requires `deprecated_date`. The artifact schema remains authoritative for all other fields.
 
 ### Consistency Checks
 
 Validators MUST enforce:
 
-1. `ACTIVE` artifacts MUST have an `approved` date
+1. `ACTIVE` artifacts MUST have `version` and an `approved` date
 2. `DEPRECATED` artifacts MUST have a `deprecated_date`
 3. `DEPRECATED` artifacts SHOULD have `superseded_by` when applicable
 4. References to `DEPRECATED` artifacts MUST generate warnings

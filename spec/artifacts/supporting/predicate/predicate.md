@@ -24,6 +24,9 @@ Predicates are composed into invariants. While invariants express complete secur
 
 ## Optional Fields
 
+This artifact accepts the [shared lifecycle metadata](../../../semantics/03-artifact-lifecycle.md#shared-lifecycle-fields). `ACTIVE` requires `version` and `approved`; `DEPRECATED` requires `deprecated_date`.
+
+
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `implementation` | Implementation | - | Code hints showing how predicate maps to implementation |
@@ -147,6 +150,8 @@ related:
   - P-SHOP-HAS-PERMISSION
 
 status: ACTIVE
+version: "1.0.0"
+approved: "2025-01-15"
 ```
 
 ---
@@ -183,6 +188,8 @@ used_in:
   - INV-AWS-CONSOLE-MFA
 
 status: ACTIVE
+version: "1.0.0"
+approved: "2025-01-15"
 ```
 
 ---

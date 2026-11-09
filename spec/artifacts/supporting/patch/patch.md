@@ -361,3 +361,7 @@ DRAFT -> IN_PROGRESS -> VERIFICATION -> VALIDATION -> VACCINATION -> VALUATION -
 - Claiming a patch fixed a finding without re-running the exploration and recording verification evidence.
 - Narrow fixes that don’t generalize (“vaccinate”); update invariants/generators when appropriate.
 - Leaving regression risk unaddressed (no tests, no invariant reasoning, no guardrails).
+
+### Completion constraint
+
+A `COMPLETE` patch MUST record `HOLDS` for every `verification.explorations_rerun[].result_after`. A failed or unresolved rerun cannot support completion. Static validation checks these reported results; it does not rerun the experiment or prove the repair.

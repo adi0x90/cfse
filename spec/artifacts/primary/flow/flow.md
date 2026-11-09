@@ -29,6 +29,9 @@ Flows compose Interactions into meaningful user journeys. While an Interaction i
 
 ## Optional Fields
 
+This artifact accepts the [shared lifecycle metadata](../../../semantics/03-artifact-lifecycle.md#shared-lifecycle-fields). `ACTIVE` requires `version` and `approved`; `DEPRECATED` requires `deprecated_date`.
+
+
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `description` | string | - | Detailed description of the flow's purpose |
@@ -291,7 +294,7 @@ variants:
     steps:
       - order: 2
         actor: User
-        interaction: I-SHOP-COLLECT-GUEST-INFO-001
+        interaction: I-SHOP-COLLECT-GUESTINFO-001
         purpose: "Gather email and contact for guest"
         post:
           - INV-SHOP-GUEST-INFO-VALID
@@ -359,6 +362,7 @@ security_insights:
     - "Inventory service checks stock"
 
 status: ACTIVE
+approved: "2025-01-15"
 version: "1.2.0"
 ```
 

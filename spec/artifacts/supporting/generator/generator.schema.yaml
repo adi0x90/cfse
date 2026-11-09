@@ -114,7 +114,21 @@ properties:
       Optional extension-specific fields. Extensions MUST be declared by the
       corpus to be validated. See foundations/extensions.md.
 
+  version:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactVersion
+  approved:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/LifecycleDate
+  deprecated_date:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/LifecycleDate
+  superseded_by:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactID
+  deprecation_reason:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/NonBlankString
+
 additionalProperties: false
+
+allOf:
+  - $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactLifecycle"
 
 $defs:
   GeneratorStrategy:

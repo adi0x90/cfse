@@ -337,6 +337,8 @@ Or with named arguments:
 <PredicateID>(<param1>=<value1>, <param2>=<value2>)
 ```
 
+Calls MUST use either positional arguments or named arguments, never a mixture. Named predicate arguments MUST match each declared parameter exactly once; positional arguments follow signature order. Action calls take one or more positional values: a single argument denotes an implicit subject, while additional values describe the subject, object and operation context. This syntax does not supply an execution model for actions.
+
 ### Argument Types
 
 | Type | Description | Example |
@@ -425,6 +427,9 @@ Actions represent security-relevant operations on resources.
 | `DELETE` | Remove resource | IAM users, EC2 instances |
 | `ACCESS` | Generic access (read or write) | Any resource |
 | `EXECUTE` | Execute code or command | Lambda, container exec |
+| `ASSUME` | Assume an identity or role | IAM roles |
+| `GRANT` | Grant authority | Permissions, capabilities |
+| `REVOKE` | Revoke authority | Permissions, credentials |
 
 ### Action Syntax
 
@@ -479,7 +484,9 @@ FORALL user: C-K8S-USER.
 
 ---
 
-## Complete Invariant Examples
+## Invariant Logic Examples
+
+The following fragments illustrate `logic` and rationale. A complete artifact also needs the fields required by the Invariant schema; referenced concepts and predicates must exist in the supplied corpus.
 
 ### Example 1: No Public S3 Buckets
 
@@ -487,7 +494,7 @@ FORALL user: C-K8S-USER.
 id: INV-AWS-NO-PUBLIC-S3
 name: No Public S3 Buckets
 criticality: P0
-expression: |
+logic: |
   FORALL bucket: C-AWS-S3-BUCKET.
     NOT P-AWS-IS-PUBLIC(bucket)
 rationale: |
@@ -501,7 +508,7 @@ rationale: |
 id: INV-AWS-ADMIN-MFA
 name: MFA Required for Admin Access
 criticality: P0
-expression: |
+logic: |
   FORALL role: C-AWS-IAM-ROLE.
     P-AWS-IS-ADMIN(role) IMPLIES
     FORALL principal: C-AWS-IAM-PRINCIPAL.
@@ -518,7 +525,7 @@ rationale: |
 id: INV-K8S-POD-SECURITY
 name: Pod Security Standards
 criticality: P1
-expression: |
+logic: |
   FORALL pod: C-K8S-POD.
     (P-K8S-IS-PRIVILEGED(pod) OR P-K8S-HOST-NETWORK(pod))
     IMPLIES P-K8S-IN-NAMESPACE(pod, "kube-system")
@@ -533,7 +540,7 @@ rationale: |
 id: INV-AWS-ENCRYPTION-REST
 name: Encryption at Rest Required
 criticality: P0
-expression: |
+logic: |
   FORALL resource: C-AWS-DATA-STORE.
     P-AWS-STORES-DATA(resource) IMPLIES
       EXISTS key: C-AWS-KMS-KEY.
@@ -549,7 +556,7 @@ rationale: |
 id: INV-AWS-LEAST-PRIVILEGE
 name: Least Privilege Access
 criticality: P1
-expression: |
+logic: |
   FORALL principal: C-AWS-IAM-PRINCIPAL.
     FORALL action: Action.
       FORALL resource: C-AWS-RESOURCE.
@@ -567,7 +574,7 @@ rationale: |
 id: INV-OAUTH2-TOKEN-EXPIRY
 name: Token Expiration Required
 criticality: P1
-expression: |
+logic: |
   FORALL token: C-OAUTH2-ACCESS-TOKEN.
     P-OAUTH2-HAS-EXPIRY(token) AND
     P-OAUTH2-EXPIRY-WITHIN(token, "1h")
@@ -582,7 +589,7 @@ rationale: |
 id: INV-AWS-TRUST-BOUNDARY
 name: Cross-Account Trust Boundaries
 criticality: P0
-expression: |
+logic: |
   FORALL role: C-AWS-IAM-ROLE.
     FORALL external: C-AWS-ACCOUNT.
       P-AWS-TRUSTS-ACCOUNT(role, external) IMPLIES
@@ -603,7 +610,7 @@ expression     ::= iff_expr
 
 iff_expr       ::= leads_to_expr (IFF leads_to_expr)?
 leads_to_expr  ::= implies_expr (LEADS_TO implies_expr)?
-implies_expr   ::= or_expr (IMPLIES or_expr)?
+implies_expr   ::= or_expr (IMPLIES implies_expr)?
 or_expr        ::= and_expr (OR and_expr)*
 and_expr       ::= not_expr (AND not_expr)*
 not_expr       ::= (NOT | temporal_unary) not_expr | quantified | primary
@@ -613,17 +620,19 @@ temporal_unary ::= ALWAYS | EVENTUALLY
 quantified     ::= quantifier variable ':' domain '.' expression
 quantifier     ::= FORALL | EXISTS
 
-primary        ::= predicate_app | action | '(' expression ')' | variable
+primary        ::= predicate_app | action | '(' expression ')' | variable | boolean
 predicate_app  ::= PredicateID '(' arg_list ')'
 action         ::= ACTION '(' arg_list ')'
 
 arg_list       ::= argument (',' argument)*
-argument       ::= variable | literal | property_access | artifact_id
-property_access ::= variable '.' identifier
+argument       ::= (identifier '=')? value
+value          ::= variable | literal | property_access | artifact_id
+property_access ::= variable ('.' identifier)+
 
 variable       ::= lowercase_identifier
 domain         ::= ConceptID | type_name
-literal        ::= '"' string '"' | number
+literal        ::= '"' string '"' | integer | boolean
+boolean        ::= 'true' | 'false'
 
 IFF            ::= 'IFF' | '<=>'
 LEADS_TO       ::= 'LEADS_TO' | '~>'
@@ -636,6 +645,7 @@ EVENTUALLY     ::= 'EVENTUALLY' | '<>'
 FORALL         ::= 'FORALL'
 EXISTS         ::= 'EXISTS'
 ACTION         ::= 'CREATE' | 'READ' | 'UPDATE' | 'DELETE' | 'ACCESS' | 'EXECUTE'
+                 | 'ASSUME' | 'GRANT' | 'REVOKE'
 ```
 
 ---
@@ -656,7 +666,11 @@ ACTION         ::= 'CREATE' | 'READ' | 'UPDATE' | 'DELETE' | 'ACCESS' | 'EXECUTE
 2. Domain must reference valid ConceptID or type
 3. Predicate arguments must match signature
 4. Property access must reference valid concept attributes
-5. Temporal operators require an evaluation trace (at minimum, a 1-step snapshot trace)
+5. A bare variable in a boolean expression must have boolean type
+6. Supported built-in domains are `string`, `integer`, `boolean`, `uuid`, `timestamp`, `any`, and `Action`; other domains must resolve to Concept artifacts
+7. Temporal expressions can be parsed and type checked without evaluating them. Evaluating them requires an explicitly defined trace model; a finite snapshot alone does not prove an unbounded temporal property
+
+Schema validation only checks that `logic` is a string. Semantic validation MUST parse it, resolve references and check bindings, predicate arguments and property access. It MUST NOT claim a theorem proof, satisfiability result, real-world truth, or temporal evaluation merely because those static checks pass.
 
 ### Example Validation Errors
 
@@ -666,7 +680,7 @@ ACTION         ::= 'CREATE' | 'READ' | 'UPDATE' | 'DELETE' | 'ACCESS' | 'EXECUTE
 | `P-AWS-HAS-MFA(y)` | Variable y not bound |
 | `A IMPLIES` | Missing right operand |
 | `((A AND B)` | Unbalanced parentheses |
-| `EXECUTE(principal)` | Missing required action target |
+| `EXECUTE()` | Action requires at least one argument |
 
 ---
 
