@@ -287,21 +287,19 @@ Criticality:
 
 ### Verdict
 
-Outcome of exploration or test execution.
+Outcome of an exploration. An unexecuted draft or plan omits `verdict`; it does not use a fabricated result.
 
 | Value | Description |
 |-------|-------------|
-| `PASS` | Test passed, no security issues found |
-| `FAIL` | Test failed, security issue confirmed |
-| `INCONCLUSIVE` | Unable to determine outcome |
-| `BLOCKED` | Test could not be executed |
-| `SKIPPED` | Test intentionally skipped |
+| `VIOLATION_CONFIRMED` | Direct evidence demonstrates a targeted invariant violation |
+| `ENFORCEMENT_CONFIRMED` | Direct evidence demonstrates all targeted invariants held in this run |
+| `INCONCLUSIVE` | Execution occurred but did not establish a conclusive result |
+| `BLOCKED` | The experiment could not execute |
 
 ```yaml
-# Schema definition
 Verdict:
   type: string
-  enum: [PASS, FAIL, INCONCLUSIVE, BLOCKED, SKIPPED]
+  enum: [VIOLATION_CONFIRMED, ENFORCEMENT_CONFIRMED, INCONCLUSIVE, BLOCKED]
 ```
 
 ### InvariantState
@@ -933,9 +931,9 @@ FlowStepList:
 | Type | Values |
 |------|--------|
 | Criticality | `P0`, `P1`, `P2`, `P3` |
-| Verdict | `PASS`, `FAIL`, `INCONCLUSIVE`, `BLOCKED`, `SKIPPED` |
+| Verdict | `VIOLATION_CONFIRMED`, `ENFORCEMENT_CONFIRMED`, `INCONCLUSIVE`, `BLOCKED` |
 | InvariantState | `HOLDS`, `VIOLATED`, `UNKNOWN`, `NOT_APPLICABLE` |
-| ArtifactStatus | `DRAFT`, `REVIEW`, `ACTIVE`, `DEPRECATED`, `ARCHIVED` |
+| ArtifactStatus | `DRAFT`, `REVIEW`, `PLANNED`, `ACTIVE`, `DEPRECATED`, `ARCHIVED` |
 | Severity | `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, `INFO` |
 | FindingCategory | `AUTHZ`, `AUTHN`, `CRYPTO`, `CONFIG`, `INJECT`, `LEAK`, `LOGIC`, `RACE`, `SSRF`, `IDOR` |
 | ConceptType | `IDENTITY`, `RESOURCE`, `POLICY`, `CREDENTIAL`, `TOKEN`, `KEY`, `CONFIGURATION` |

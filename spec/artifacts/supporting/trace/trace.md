@@ -28,6 +28,9 @@ Traces are most useful when:
 
 ## Optional Fields
 
+This artifact accepts the [shared lifecycle metadata](../../../semantics/03-artifact-lifecycle.md#shared-lifecycle-fields). `ACTIVE` requires `version` and `approved`; `DEPRECATED` requires `deprecated_date`.
+
+
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `scenario_ref` | ScenarioID | - | Convenience link back to the scenario |
@@ -77,6 +80,7 @@ steps:
       - "P-SHOP-ITEM-EXISTS(\"item-xyz789\")" # Example predicate fact (optional)
     notes: "Item deleted successfully by owner"
 status: ACTIVE
+approved: "2025-01-15"
 version: "1.0.0"
 ```
 
@@ -100,6 +104,7 @@ steps:
   - i: 1
     notes: "Unexpected success: item deleted by non-owner"
 status: ACTIVE
+approved: "2025-01-15"
 version: "1.0.0"
 ```
 

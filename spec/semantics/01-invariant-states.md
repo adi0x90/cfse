@@ -12,8 +12,8 @@ During explorations, invariants are evaluated against system behavior to determi
 
 | State | Description | Implies |
 |-------|-------------|---------|
-| `HOLDS` | System prevented the violation | Security control is working |
-| `VIOLATED` | System allowed the violation | Security vulnerability exists |
+| `HOLDS` | Evidence shows the targeted property held in this run | Scoped enforcement evidence |
+| `VIOLATED` | Evidence shows a targeted property violation in this run | Scoped counterexample |
 | `UNKNOWN` | Could not determine state | Requires further investigation |
 | `NOT_APPLICABLE` | Not evaluated in this exploration | Neutral - no conclusion drawn |
 
@@ -31,34 +31,26 @@ When an invariant is marked HOLDS:
 
 1. The attack path (ATT) was executed
 2. The attack was blocked or rejected by the system
-3. The protected resource or state remained intact
+3. Property-specific evidence shows the protected state, data, or effect remained protected
 4. Observable behavior differed from the baseline as expected
 
 ### Usage Criteria
 
-An invariant MUST be marked HOLDS when ALL of the following conditions are met:
+An invariant MUST be marked HOLDS only when the ATT path was executed against a working matched BASE and direct, property-specific evidence shows the attempted violation was prevented. For a deletion invariant this includes verifying that the protected item remains present; for confidentiality it includes inspecting the returned data.
 
-- The ATT path attempted to violate the invariant
-- The system returned an error response (e.g., 403, 401, 422)
-- The protected state was NOT modified
-- Side effects were NOT triggered
+An error status alone is insufficient, and an error status is not mandatory: a safe no-op may return success while preserving the property. `HOLDS` describes this execution, not all possible executions of the system.
 
 ### Example
 
 ```yaml
-invariant:
-  id: INV-FILE-OWNER-DELETE
-  state: HOLDS
-  evidence:
-    att_status: 403
-    att_body: '{"error": "Forbidden"}'
-    resource_state: "unchanged"
-    notes: "User B could not delete User A's file"
+invariant: INV-FILE-OWNER-DELETE
+state: HOLDS
+evidence: "ATT returned 403; an owner-side read confirmed the file remained present and unchanged after the attempted deletion."
 ```
 
 ### Related Verdict
 
-When an invariant is HOLDS, the exploration verdict SHOULD be `ENFORCEMENT_CONFIRMED`.
+Only when every targeted invariant is supported as `HOLDS` and the confirmed-outcome requirements are met may the exploration use `ENFORCEMENT_CONFIRMED`.
 
 ---
 
@@ -74,34 +66,26 @@ When an invariant is marked VIOLATED:
 
 1. The attack path (ATT) was executed
 2. The attack succeeded in circumventing security controls
-3. The protected resource or state was improperly modified
+3. Direct evidence establishes an unauthorized effect, disclosure, or other breach of the targeted property
 4. Observable behavior matched the baseline when it should have differed
 
 ### Usage Criteria
 
-An invariant MUST be marked VIOLATED when ANY of the following conditions are met:
+An invariant MUST be marked VIOLATED only when the ATT path executed against a working matched BASE and direct, property-specific evidence establishes a breach. This may be unauthorized modification, disclosure, an unintended side effect, or another concrete counterexample to the invariant.
 
-- The ATT path succeeded in modifying protected state
-- The ATT path received success response when rejection was expected
-- The ATT path triggered side effects that should have been blocked
-- The delta between BASE and ATT is insufficient (both paths behave identically)
+A success response, an identical BASE/ATT status, or an otherwise small delta alone MUST NOT establish `VIOLATED`. If the protected effect is not observed or the result is ambiguous, use `UNKNOWN` and an `INCONCLUSIVE` exploration verdict.
 
 ### Example
 
 ```yaml
-invariant:
-  id: INV-ORDER-PAYMENT-REQUIRED
-  state: VIOLATED
-  evidence:
-    att_status: 200
-    att_body: '{"status": "paid"}'
-    resource_state: "modified"
-    notes: "Order status changed to 'paid' without payment"
+invariant: INV-ORDER-PAYMENT-REQUIRED
+state: VIOLATED
+evidence: "After ATT skipped payment, an independent order read showed status paid without a payment record."
 ```
 
 ### Related Verdict
 
-When an invariant is VIOLATED, the exploration verdict SHOULD be `VIOLATION_CONFIRMED`.
+A supported targeted `VIOLATED` state can justify `VIOLATION_CONFIRMED` when all confirmed-outcome requirements and Finding linkage are satisfied.
 
 ---
 
@@ -132,19 +116,14 @@ An invariant SHOULD be marked UNKNOWN when ANY of the following conditions are m
 ### Example
 
 ```yaml
-invariant:
-  id: INV-PAYMENT-IDEMPOTENT
-  state: UNKNOWN
-  evidence:
-    att_status: 500
-    att_body: '{"error": "Internal server error"}'
-    resource_state: "unknown"
-    notes: "Server crashed during replay attempt; cannot determine if idempotency holds"
+invariant: INV-PAYMENT-IDEMPOTENT
+state: UNKNOWN
+evidence: "ATT returned 500; post-request account state could not be read, so replay effects remain unknown."
 ```
 
 ### Related Verdict
 
-When an invariant is UNKNOWN, the exploration verdict SHOULD be `INCONCLUSIVE`.
+If no targeted violation is established and any targeted invariant is `UNKNOWN`, the exploration verdict is `INCONCLUSIVE`. A supported violation of another target can still justify `VIOLATION_CONFIRMED`.
 
 ---
 
@@ -175,10 +154,9 @@ An invariant SHOULD be marked NOT_APPLICABLE when ANY of the following condition
 ### Example
 
 ```yaml
-invariant:
-  id: INV-ADMIN-REQUIRES-MFA
-  state: NOT_APPLICABLE
-  notes: "Out of scope for this exploration; covered by E-AUTH-MFA-001-01"
+invariant: INV-ADMIN-REQUIRES-MFA
+state: NOT_APPLICABLE
+evidence: "Not tested; requires a separate exploration before claiming enforcement."
 ```
 
 ### Related Verdict
@@ -254,30 +232,13 @@ Review this checklist when assigning invariant states:
 
 ### Schema Compliance
 
-```yaml
-InvariantObservation:
-  type: object
-  required: [id, state]
-  properties:
-    id:
-      $ref: "#/$defs/InvariantID"
-    state:
-      type: string
-      enum: [HOLDS, VIOLATED, UNKNOWN, NOT_APPLICABLE]
-    evidence:
-      type: object
-    notes:
-      type: string
-```
+The authoritative record is `InvariantResult` in [the Exploration schema](../artifacts/primary/exploration/exploration.schema.yaml). It uses `invariant` (an InvariantID), `state` (an InvariantState), and optional `evidence` text. `HOLDS` and `VIOLATED` require nonblank evidence.
 
 ### Consistency Checks
 
-Validators MUST enforce:
+Validators MUST reject duplicate or unrelated invariant observations. Confirmed violation requires at least one targeted `VIOLATED` state; confirmed enforcement requires every targeted invariant as `HOLDS`. Drafts, blocked runs and inconclusive runs do not require decisive observations.
 
-1. Every invariant referenced in an exploration MUST have a state
-2. At least one targeted invariant MUST have state other than NOT_APPLICABLE for a valid exploration
-3. VIOLATED state MUST be accompanied by evidence
-4. HOLDS state SHOULD be accompanied by evidence
+Researchers MUST ensure the direct evidence comes from this execution or its linked Trace and supports the declared property. Static record validation does not establish that semantic relationship. See [Exploration Key Patterns](../artifacts/primary/exploration/exploration.md#key-patterns).
 
 ---
 

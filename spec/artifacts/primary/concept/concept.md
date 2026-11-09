@@ -25,6 +25,9 @@ Concepts are NOT implementation artifacts (classes, tables, services). A single 
 
 ## Optional Fields
 
+This artifact accepts the [shared lifecycle metadata](../../../semantics/03-artifact-lifecycle.md#shared-lifecycle-fields). `ACTIVE` requires `version` and `approved`; `DEPRECATED` requires `deprecated_date`.
+
+
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `states` | StateMachine | - | Lifecycle states and transitions if concept has discrete states |
@@ -287,6 +290,7 @@ security_investigation_candidates:
   - "Account enumeration via timing - do login/reset responses leak existence?"
 
 status: ACTIVE
+approved: "2025-01-15"
 version: "1.2.0"
 ```
 

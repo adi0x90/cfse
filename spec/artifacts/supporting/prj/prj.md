@@ -33,6 +33,9 @@ PRJ enables:
 
 ## Optional Fields
 
+This artifact accepts the [shared lifecycle metadata](../../../semantics/03-artifact-lifecycle.md#shared-lifecycle-fields). `ACTIVE` requires `version` and `approved`; `DEPRECATED` requires `deprecated_date`.
+
+
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `assumptions` | object | - | Traceability references to `P-*` / `INV-*` used to define the projection’s context |

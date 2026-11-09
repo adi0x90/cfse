@@ -1,2 +1,7 @@
 # System Metadata
 .DS_STORE
+
+# Local Python validation environments and caches
+.venv/
+__pycache__/
+*.pyc

@@ -18,7 +18,7 @@ CFSE defines three conformance levels to accommodate different use cases:
 - Concepts MUST have: ID, Name, Promise, Entry Points (with `EP-*` IDs), Invariants (may be empty)
 - Entry Points MUST have: ID, Title, Owner Concept, Method, Path, Action
 - Scenarios MUST have: ID, Hypothesis, Attack Vector
-- Explorations MUST have: ID, Scenario Reference, Observations, Verdict
+- Explorations MUST satisfy the Exploration schema, including exactly one Scenario Reference and outcome-dependent Observations/Verdict requirements. Unexecuted drafts and plans omit Verdict.
 
 ### Standard Conformance
 
@@ -66,6 +66,12 @@ All cross-references MUST resolve to existing artifacts.
 All artifacts MUST validate against their YAML schemas.
 
 If a corpus uses an Invariant Library YAML file, every Predicate and Invariant entry in that library MUST validate against the Predicate and Invariant schemas (see `artifacts/supporting/invariant_library/invariant_library.md`).
+
+### Separate validation results
+
+Validators SHOULD report schema, reference, lifecycle-record, logic, and evidence-record checks separately. Unsupported or unperformed checks MUST be reported as `not_checked`; they MUST NOT count as a successful full conformance claim. A schema pass alone says nothing about the meaning of `logic` or the truth of evidence text.
+
+Passing static evidence-record checks does not authenticate evidence, verify the experiment's execution, or prove a security property. Lifecycle-record checks establish required metadata, not actual approval or transition history. A complete conformance declaration still requires all applicable normative obligations, including those outside the validator's supported checks.
 
 ### Traceability Validation
 

@@ -43,11 +43,12 @@ properties:
     description: |
       Formal logical expression using CFSE predicate notation. Uses quantifiers
       (FORALL, EXISTS), logical operators (AND, OR, NOT, IMPLIES, IFF), and
-      predicate applications. The logic must be syntactically valid and
-      semantically match the rule.
+      predicate applications. JSON Schema checks only the string representation;
+      a semantic validator must parse and type check it. Matching the English
+      rule and proving the property require separate review.
     examples:
-      - "FORALL item: C-SHOP-ITEM. DELETE(user, item) IMPLIES P-SHOP-IS-OWNER(user, item)"
-      - "FORALL ep: EntryPoint. ACCESS(user, ep) IMPLIES P-AUTH-AUTHENTICATED(user)"
+      - "FORALL user: C-SHOP-USER. FORALL item: C-SHOP-ITEM. DELETE(user, item) IMPLIES P-SHOP-IS-OWNER(user, item)"
+      - "FORALL user: C-AUTH-USER. FORALL ep: C-AUTH-ENDPOINT. ACCESS(user, ep) IMPLIES P-AUTH-AUTHENTICATED(user)"
 
   predicates:
     type: array
@@ -117,7 +118,21 @@ properties:
       Optional extension-specific fields. Extensions MUST be declared by the
       corpus to be validated. See foundations/extensions.md.
 
+  version:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactVersion
+  approved:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/LifecycleDate
+  deprecated_date:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/LifecycleDate
+  superseded_by:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactID
+  deprecation_reason:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/NonBlankString
+
 additionalProperties: false
+
+allOf:
+  - $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactLifecycle"
 
 $defs:
   InvariantTag:

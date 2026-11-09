@@ -28,6 +28,9 @@ Findings represent proven security issues - not hypotheses (scenarios) or experi
 
 ## Optional Fields
 
+This artifact accepts the [shared lifecycle metadata](../../../semantics/03-artifact-lifecycle.md#shared-lifecycle-fields). `ACTIVE` requires `version` and `approved`; `DEPRECATED` requires `deprecated_date`.
+
+
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `category` | FindingCategory | - | Classification: AUTHZ, AUTHN, IDOR, etc. |
@@ -431,6 +434,7 @@ metadata:
     - "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/04-Testing_for_Insecure_Direct_Object_References"
 
 status: ACTIVE
+approved: "2025-01-15"
 version: "1.0.0"
 ```
 

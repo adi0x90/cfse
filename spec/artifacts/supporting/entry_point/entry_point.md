@@ -14,6 +14,9 @@ Entry Points are the single source of truth for:
 
 **Schema:** [`entry_point.schema.yaml`](./entry_point.schema.yaml)
 
+This artifact accepts the [shared lifecycle metadata](../../../semantics/03-artifact-lifecycle.md#shared-lifecycle-fields). `ACTIVE` requires `version` and `approved`; `DEPRECATED` requires `deprecated_date`.
+
+
 ---
 
 ## Why EP is a Standalone Artifact

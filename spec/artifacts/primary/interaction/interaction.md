@@ -31,6 +31,9 @@ Interactions are the "verbs" of the CFSE world model. While concepts are the nou
 
 ## Optional Fields
 
+This artifact accepts the [shared lifecycle metadata](../../../semantics/03-artifact-lifecycle.md#shared-lifecycle-fields). `ACTIVE` requires `version` and `approved`; `DEPRECATED` requires `deprecated_date`.
+
+
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `description` | string | - | Detailed description of the interaction's purpose |
@@ -270,6 +273,7 @@ security_insights:
     - "Authentication service for token validation"
 
 status: ACTIVE
+approved: "2025-01-15"
 version: "1.0.0"
 ```
 

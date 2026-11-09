@@ -119,8 +119,7 @@ properties:
       Lifecycle status of this finding artifact.
 
   version:
-    type: string
-    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactVersion"
     description: |
       Semantic version of this finding.
 
@@ -130,7 +129,19 @@ properties:
       Optional extension-specific fields. Extensions MUST be declared by the
       corpus to be validated. See foundations/extensions.md.
 
+  approved:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/LifecycleDate
+  deprecated_date:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/LifecycleDate
+  superseded_by:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactID
+  deprecation_reason:
+    $ref: https://cfse.ai/schemas/grammar.schema.yaml#/$defs/NonBlankString
+
 additionalProperties: false
+
+allOf:
+  - $ref: "https://cfse.ai/schemas/grammar.schema.yaml#/$defs/ArtifactLifecycle"
 
 $defs:
   Evidence:

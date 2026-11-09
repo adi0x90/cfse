@@ -25,6 +25,9 @@ Every security property in CFSE is expressed as an invariant. Concepts, interact
 
 ## Optional Fields
 
+This artifact accepts the [shared lifecycle metadata](../../../semantics/03-artifact-lifecycle.md#shared-lifecycle-fields). `ACTIVE` requires `version` and `approved`; `DEPRECATED` requires `deprecated_date`.
+
+
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `dependencies` | InvariantID[] | - | Other invariants this one depends on or assumes |
@@ -201,6 +204,8 @@ observability:
       runbook: "https://wiki.example.com/runbooks/unauthorized-delete"
 
 status: ACTIVE
+version: "1.0.0"
+approved: "2025-01-15"
 ```
 
 ---

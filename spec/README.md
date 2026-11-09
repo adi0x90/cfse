@@ -3,6 +3,8 @@
 **Version:** 1.0.0
 **Status:** Stable
 
+These labels describe the released 1.0.0 specification. The current working tree includes an **unreleased breaking contract repair** for a future major release; see the [changelog](changelog.md) and [migration guide](../guides/migrations/contract-repair.md). It is not a new release of 1.0.0.
+
 ## Overview
 
 This directory contains the normative specification for Concept Flow Scenarios Explorations (CFSE)—a formal methodology for security epistemology.
