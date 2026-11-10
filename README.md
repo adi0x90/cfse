@@ -1,6 +1,6 @@
 # CFSE - Concept Flow Scenarios Explorations
 
-**Version 2.0.0** | November 2026
+**Version 2.0.1** | November 2026
 
 CFSE 2.0.0 includes breaking contract repairs. Before upgrading a corpus or tool, read the [migration guide](guides/migrations/contract-repair.md), [changelog](spec/changelog.md), and [validation instructions](tests/README.md). Pin the `v2.0.0` tag or an exact commit when validating corpora.
 

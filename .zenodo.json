@@ -1,0 +1,17 @@
+{
+  "title": "CFSE - Concept Flow Scenarios Explorations",
+  "description": "CFSE is a formal methodology for security epistemology: a structured world model of concepts, interactions, and flows; invariants with temporal logic; and explorations backed by structured evidence.",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "version": "2.0.1",
+  "publication_date": "2026-11-10",
+  "creators": [
+    {
+      "name": "Gupta, Aditya",
+      "affiliation": "Attify",
+      "orcid": "0009-0000-9899-483X"
+    }
+  ],
+  "keywords": ["security", "methodology", "invariants", "world model", "exploration", "CFSE"]
+}

@@ -9,7 +9,7 @@
 
 cfse:
   name: "Concept Flow Scenarios Explorations"
-  version: "2.0.0"
+  version: "2.0.1"
   tagline: >
     A formal methodology for security epistemology: replacing intuition with structure,
     and claims with evidence.
