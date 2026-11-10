@@ -1,6 +1,6 @@
 # CFSE Specification
 
-**Version:** 2.0.0
+**Version:** 2.0.1
 **Status:** Stable
 
 Version 2.0.0 includes breaking changes to lifecycle and Exploration records. See the [changelog](changelog.md) and [migration guide](../guides/migrations/contract-repair.md) before upgrading.

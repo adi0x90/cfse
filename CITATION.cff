@@ -5,6 +5,18 @@ type: software
 authors:
   - given-names: "Aditya"
     family-names: "Gupta"
-version: "1.0.0"
-date-released: "2026-01-25"
+    affiliation: "Attify"
+    orcid: "https://orcid.org/0009-0000-9899-483X"
+version: "2.0.1"
+date-released: "2026-11-10"
 license: "Apache-2.0"
+repository-code: "https://github.com/adi0x90/cfse"
+url: "https://github.com/adi0x90/cfse"
+abstract: "CFSE is a formal methodology for security epistemology: a structured world model of concepts, interactions, and flows; invariants with temporal logic; and explorations backed by structured evidence."
+keywords:
+  - security
+  - methodology
+  - invariants
+  - world model
+  - exploration
+  - CFSE

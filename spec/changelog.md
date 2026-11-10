@@ -14,6 +14,17 @@ This changelog starts at **1.0.0**, the first public release.
 
 ### Removed
 
+## [2.0.1] - 2026-11-10
+
+### Added
+
+- `CITATION.cff` with the author ORCID and repository.
+- `.zenodo.json` for the Zenodo GitHub integration.
+
+### Changed
+
+- No normative changes; the specification text is unchanged.
+
 ## [2.0.0] - 2026-11-09
 
 ### Added
