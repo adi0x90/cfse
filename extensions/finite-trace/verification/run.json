@@ -1,0 +1,151 @@
+{
+  "date": "2026-11-12",
+  "implementation_revision": "856beee0f004097f94de86b075aff22896172fbe",
+  "base_revision": "34575b9191c6a457faf669e505abac9af2e6dd2a",
+  "publication": "not pushed or released",
+  "tests_per_interpreter": {
+    "run": 33,
+    "passed": 32,
+    "skipped": 1,
+    "failed": 0
+  },
+  "skip": "pre-existing optional full-core external semantic-validator integration; no CFSE_CONTRACT_BINARY supplied",
+  "cli_cases": 12,
+  "decision_combinations": 36,
+  "interpreters": [
+    "Python 3.12.13",
+    "Python 3.15.2"
+  ],
+  "dependencies": [
+    {
+      "name": "attrs",
+      "version": "26.1.0"
+    },
+    {
+      "name": "jsonschema",
+      "version": "4.26.0"
+    },
+    {
+      "name": "jsonschema-specifications",
+      "version": "2025.9.1"
+    },
+    {
+      "name": "pip",
+      "version": "26.0.1"
+    },
+    {
+      "name": "PyYAML",
+      "version": "6.0.3"
+    },
+    {
+      "name": "referencing",
+      "version": "0.37.0"
+    },
+    {
+      "name": "rpds-py",
+      "version": "2026.9.1"
+    },
+    {
+      "name": "typing_extensions",
+      "version": "4.16.0"
+    }
+  ],
+  "command_note": "Run from repository root. CFSE_VERIFY_ENV is a fresh Python 3.12 venv. SYNTHETIC_DENIED_UNKNOWN_TRACE is denied-unknown-input.json in this directory.",
+  "checks": [
+    {
+      "check": "python312-suite",
+      "command": [
+        "$CFSE_VERIFY_ENV/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "output": "python312-suite.txt",
+      "output_sha256": "4fa012a855db2035c590b9c3366c25a401ba040d8fafbe377c39ce97c767db8e"
+    },
+    {
+      "check": "python315-suite",
+      "command": [
+        ".venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "output": "python315-suite.txt",
+      "output_sha256": "adf6825325059aa658b2f6bd4227dc392cf77859f6a605cc23eb7f8e225d90d8"
+    },
+    {
+      "check": "benign-cli",
+      "command": [
+        "$CFSE_VERIFY_ENV/bin/python",
+        "-B",
+        "extensions/finite-trace/evaluate.py",
+        "--artifacts",
+        "extensions/finite-trace/fixtures/artifacts.json",
+        "--config",
+        "extensions/finite-trace/fixtures/bindings.json",
+        "--trace",
+        "extensions/finite-trace/fixtures/trace.json"
+      ],
+      "exit_code": 0,
+      "output": "benign-cli.txt",
+      "output_sha256": "6355f89d6e9f03b269a787a688509b2beff21d409e29e2ecd4d7903f3a7af38a"
+    },
+    {
+      "check": "denied-unknown-cli",
+      "command": [
+        "$CFSE_VERIFY_ENV/bin/python",
+        "-B",
+        "extensions/finite-trace/evaluate.py",
+        "--artifacts",
+        "extensions/finite-trace/fixtures/artifacts.json",
+        "--config",
+        "extensions/finite-trace/fixtures/bindings.json",
+        "--trace",
+        "$SYNTHETIC_DENIED_UNKNOWN_TRACE"
+      ],
+      "exit_code": 1,
+      "output": "denied-unknown-cli.txt",
+      "output_sha256": "e64a76033118d9b9d3777a313748db05eeb2c481b09ca835cd8967d981538074"
+    },
+    {
+      "check": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output": "diff-check.txt",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "schema-unchanged",
+      "command": [
+        "git",
+        "diff",
+        "34575b9191c6a457faf669e505abac9af2e6dd2a",
+        "--",
+        "spec/**/*.schema.yaml"
+      ],
+      "exit_code": 0,
+      "output": "schema-unchanged.txt",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "source_sha256": {
+    "extensions/finite-trace/evaluate.py": "cfe88d4abccb8a312ba5e535a2b84cf11099e561b4aea264e09a50ec49070049",
+    "tests/test_finite_trace.py": "5629280bf402c6f16b6e4f9e9b15eaf160eb24de2fedcb15800715e09dd4a492",
+    "spec/semantics/04-traceability.md": "698fd780e243271ad5e0049e5cae196088213177dbf3b803ed9c2330c5022bcd"
+  }
+}

@@ -1,0 +1,38 @@
+test_canonical_schema_cases (test_contract.ContractTests.test_canonical_schema_cases) ... ok
+test_cli_shared_cases_yaml_and_frontmatter (test_contract.ContractTests.test_cli_shared_cases_yaml_and_frontmatter) ... skipped 'set CFSE_CONTRACT_BINARY for optional semantic validation'
+test_complete_artifact_examples (test_contract.ContractTests.test_complete_artifact_examples) ... ok
+test_public_flow_trigger_and_interaction_ids (test_contract.ContractTests.test_public_flow_trigger_and_interaction_ids) ... ok
+test_schemas_are_valid_and_references_resolve (test_contract.ContractTests.test_schemas_are_valid_and_references_resolve) ... ok
+test_exhaustive_synthetic_decisions (test_finite_trace.AdversarialTests.test_exhaustive_synthetic_decisions) ... ok
+test_exists_on_incomplete_domains (test_finite_trace.AdversarialTests.test_exists_on_incomplete_domains) ... ok
+test_failure_cannot_be_hidden_by_known_true_disjunction (test_finite_trace.AdversarialTests.test_failure_cannot_be_hidden_by_known_true_disjunction) ... ok
+test_forged_scope_malformed_and_duplicate_observations (test_finite_trace.AdversarialTests.test_forged_scope_malformed_and_duplicate_observations) ... ok
+test_implementation_hint_is_never_executed (test_finite_trace.AdversarialTests.test_implementation_hint_is_never_executed) ... ok
+test_invariant_order_cannot_mask_violation (test_finite_trace.AdversarialTests.test_invariant_order_cannot_mask_violation) ... ok
+test_multistep_failure_and_identity (test_finite_trace.AdversarialTests.test_multistep_failure_and_identity) ... ok
+test_parser_rejection_and_scope_controls (test_finite_trace.AdversarialTests.test_parser_rejection_and_scope_controls) ... ok
+test_real_engine_qualification_controls (test_finite_trace.AdversarialTests.test_real_engine_qualification_controls) ... ok
+test_reject_trailing_comma_and_report_completed_schema_check (test_finite_trace.AdversarialTests.test_reject_trailing_comma_and_report_completed_schema_check) ... ok
+test_schema_and_binding_drift (test_finite_trace.AdversarialTests.test_schema_and_binding_drift) ... ok
+test_invalid_json_and_input_limit (test_finite_trace.CommandLineTests.test_invalid_json_and_input_limit) ... ok
+test_public_fixtures_end_to_end (test_finite_trace.CommandLineTests.test_public_fixtures_end_to_end) ... ok
+test_absent_missing_invalid_and_operational_outcomes (test_finite_trace.FiniteTraceTests.test_absent_missing_invalid_and_operational_outcomes) ... ok
+test_benign_reuse_and_capabilities (test_finite_trace.FiniteTraceTests.test_benign_reuse_and_capabilities) ... ok
+test_budget (test_finite_trace.FiniteTraceTests.test_budget) ... ok
+test_degenerate_qualification_controls (test_finite_trace.FiniteTraceTests.test_degenerate_qualification_controls) ... ok
+test_dependency_cycle_and_assumption (test_finite_trace.FiniteTraceTests.test_dependency_cycle_and_assumption) ... ok
+test_domains_and_trace_completeness (test_finite_trace.FiniteTraceTests.test_domains_and_trace_completeness) ... ok
+test_failures_are_not_rewards (test_finite_trace.FiniteTraceTests.test_failures_are_not_rewards) ... ok
+test_false_pass_regression (test_finite_trace.FiniteTraceTests.test_false_pass_regression) ... ok
+test_identity_changes_invalidate_reuse (test_finite_trace.FiniteTraceTests.test_identity_changes_invalidate_reuse) ... ok
+test_independent_violation_survives_missing (test_finite_trace.FiniteTraceTests.test_independent_violation_survives_missing) ... ok
+test_named_arguments_and_precedence (test_finite_trace.FiniteTraceTests.test_named_arguments_and_precedence) ... ok
+test_static_diagnostics (test_finite_trace.FiniteTraceTests.test_static_diagnostics) ... ok
+test_truth_tables (test_finite_trace.FiniteTraceTests.test_truth_tables) ... ok
+test_summary_and_validation_paths (test_finite_trace.TraceabilityExamples.test_summary_and_validation_paths) ... ok
+test_tr5_valid_fragment_against_actual_schema (test_finite_trace.TraceabilityExamples.test_tr5_valid_fragment_against_actual_schema) ... ok
+
+----------------------------------------------------------------------
+Ran 33 tests in 4.986s
+
+OK (skipped=1)

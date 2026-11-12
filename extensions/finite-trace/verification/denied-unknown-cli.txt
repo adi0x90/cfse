@@ -1,0 +1,90 @@
+{
+  "capabilities": {
+    "authenticity": "not_checked",
+    "finite_execution": "completed",
+    "full_core_conformance": "not_checked",
+    "policy_correspondence": "not_checked",
+    "proof": "not_checked",
+    "schema": "passed",
+    "static_logic": "passed"
+  },
+  "diagnostics": [],
+  "failures": [],
+  "identity": {
+    "artifacts": "132ba0a97b254167c7af8bb82d622c188f7fd8dc7320365d1ed2e85570685331",
+    "configuration": "043109383f72aeffb37408cf81f15eb81e2a9b9ba44decdf59aa7e5043ad8f5e",
+    "core_revision": "34575b9191c6a457faf669e505abac9af2e6dd2a",
+    "engine": "cfe88d4abccb8a312ba5e535a2b84cf11099e561b4aea264e09a50ec49070049",
+    "profile": "cfse-finite-trace/1",
+    "schemas": "924ba4ee43d6b0e52279b1447ba45e83d3318d666b30d14af5288d45a22a77ca",
+    "trace": "846bf1170260091dc0e3066030592290544a8562d08943001da7b5792680e485"
+  },
+  "invariants": {
+    "INV-DEMO-DELIVERY": {
+      "bindings": {
+        "P-DEMO-AVAILABLE": "1.0.0",
+        "P-DEMO-DELIVERED": "1.0.0",
+        "P-DEMO-ROLE": "1.0.0"
+      },
+      "failures": [],
+      "observations": [
+        "fixture://decision-1/delivered",
+        "fixture://decision-1/role",
+        "fixture://decision-1/available"
+      ],
+      "outcome": "UNKNOWN",
+      "passed": false,
+      "reasons": [
+        "FORALL domain C-DEMO-USER",
+        "FORALL domain C-DEMO-PROJECT",
+        "FORALL domain C-DEMO-JOB",
+        "known: synthetic denied delivery",
+        "known: synthetic observed role",
+        "unknown: synthetic availability unobserved"
+      ],
+      "reward": 0,
+      "state": "UNKNOWN"
+    },
+    "INV-DEMO-REQUEST": {
+      "bindings": {
+        "P-DEMO-REQUESTED": "1.0.0",
+        "P-DEMO-ROLE": "1.0.0"
+      },
+      "failures": [],
+      "observations": [
+        "fixture://decision-1/requested",
+        "fixture://decision-1/role"
+      ],
+      "outcome": "HOLDS",
+      "passed": true,
+      "reasons": [
+        "FORALL domain C-DEMO-USER",
+        "FORALL domain C-DEMO-PROJECT",
+        "known: synthetic observed requested",
+        "known: synthetic observed role"
+      ],
+      "reward": 1,
+      "state": "HOLDS"
+    }
+  },
+  "observations": [
+    "fixture://decision-1/requested",
+    "fixture://decision-1/role",
+    "fixture://decision-1/delivered",
+    "fixture://decision-1/available"
+  ],
+  "outcome": "UNKNOWN",
+  "passed": false,
+  "profile": "cfse-finite-trace/1",
+  "reasons": [
+    "FORALL domain C-DEMO-USER",
+    "FORALL domain C-DEMO-PROJECT",
+    "known: synthetic observed requested",
+    "known: synthetic observed role",
+    "FORALL domain C-DEMO-JOB",
+    "known: synthetic denied delivery",
+    "unknown: synthetic availability unobserved"
+  ],
+  "reward": 0,
+  "state": "UNKNOWN"
+}
