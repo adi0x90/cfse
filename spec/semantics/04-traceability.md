@@ -346,7 +346,9 @@ Patches are remediation artifacts that address specific findings. Each patch is 
 # Valid: Single finding reference
 patch:
   id: PATCH-OJS-001
-  finding_ref: FD-OJS-AUTHZ-001
+  finding_ref:
+    finding_id: FD-OJS-AUTHZ-001
+    invariant: INV-OJS-PAYMENT-COMPLETE
 
 # INVALID: No finding reference
 patch:
@@ -454,11 +456,11 @@ Patch -> Finding -> Exploration -> Scenario -> Invariant -> Predicate
 | Interaction | Invariant | `post_invariants` | 1..* |
 | Interaction | Entry Point | `entry_points` | 1..* |
 | Projection | Entry Point | `surfaces[].ref` | 1..* |
-| Finding | Exploration | `exploration_refs` | 1..* |
+| Finding | Exploration | `traceability.exploration` and `evidence[type=exploration].reference` (union) | 1..* |
 | Exploration | Scenario | `scenario_ref` | 1 |
 | Scenario | Invariant | `targeted_invariants` | 1..* |
 | Invariant | Predicate | `predicates` | 1..* |
-| Patch | Finding | `finding_ref` | 1 |
+| Patch | Finding | `finding_ref.finding_id` | 1 |
 
 ### Optional Evidence Reference Fields
 
@@ -527,13 +529,21 @@ An orphan artifact has no incoming references when references are expected.
 
 ### Schema Compliance
 
+The following is validation pseudocode, not an artifact schema. TR-1 counts the
+union of the primary exploration and exploration evidence references; it does
+not require a second reference field. TR-5 traverses the schema-required
+`FindingReference` object.
+
 ```yaml
 TraceabilityValidation:
   rules:
     TR-1:
       source: Finding
       target: Exploration
-      field: exploration_refs
+      fields:
+        - traceability.exploration
+        - evidence[type=exploration].reference
+      combine: union
       cardinality: "1..*"
       required: true
     TR-2:
@@ -545,7 +555,7 @@ TraceabilityValidation:
     TR-3:
       source: Scenario
       target: Invariant
-      field: invariants
+      field: targeted_invariants
       cardinality: "1..*"
       required: true
     TR-4:
@@ -557,7 +567,7 @@ TraceabilityValidation:
     TR-5:
       source: Patch
       target: Finding
-      field: finding_ref
+      field: finding_ref.finding_id
       cardinality: "1"
       required: true
 ```

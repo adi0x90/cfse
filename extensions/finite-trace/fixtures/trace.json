@@ -1,0 +1,80 @@
+{
+  "id": "synthetic-benign-1",
+  "scope": "synthetic-export-window-1",
+  "complete": true,
+  "domains": {
+    "C-DEMO-USER": {
+      "members": [
+        "alice"
+      ],
+      "complete": true
+    },
+    "C-DEMO-PROJECT": {
+      "members": [
+        "project-1"
+      ],
+      "complete": true
+    },
+    "C-DEMO-JOB": {
+      "members": [
+        "job-1"
+      ],
+      "complete": true
+    }
+  },
+  "steps": [
+    {
+      "id": "decision-1",
+      "facts": [
+        {
+          "predicate": "P-DEMO-ROLE",
+          "binding_version": "1.0.0",
+          "args": [
+            "alice",
+            "project-1"
+          ],
+          "state": "known",
+          "value": true,
+          "reason": "synthetic observed role",
+          "observation": "fixture://decision-1/role"
+        },
+        {
+          "predicate": "P-DEMO-AVAILABLE",
+          "binding_version": "1.0.0",
+          "args": [
+            "job-1"
+          ],
+          "state": "known",
+          "value": true,
+          "reason": "synthetic observed available",
+          "observation": "fixture://decision-1/available"
+        },
+        {
+          "predicate": "P-DEMO-REQUESTED",
+          "binding_version": "1.0.0",
+          "args": [
+            "alice",
+            "project-1"
+          ],
+          "state": "known",
+          "value": true,
+          "reason": "synthetic observed requested",
+          "observation": "fixture://decision-1/requested"
+        },
+        {
+          "predicate": "P-DEMO-DELIVERED",
+          "binding_version": "1.0.0",
+          "args": [
+            "alice",
+            "project-1",
+            "job-1"
+          ],
+          "state": "known",
+          "value": true,
+          "reason": "synthetic observed delivered",
+          "observation": "fixture://decision-1/delivered"
+        }
+      ]
+    }
+  ]
+}

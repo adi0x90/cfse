@@ -43,3 +43,10 @@ CFSE_CONTRACT_BINARY=/absolute/path/to/validator \
 ```
 
 This integration tests the static contract only. Neither its success nor these synthetic fixtures establishes real approval, execution, evidence authenticity, temporal evaluation, exhaustive coverage or theorem proof. Extension payload semantics are outside this suite.
+
+## Optional finite-trace profile tests
+
+The same default suite also runs the [finite-trace profile](../extensions/finite-trace/README.md)
+unit, adversarial and subprocess fixture tests. These execute the documented
+subset with typed bindings; they do not replace the optional full-core validator
+integration above. See the [criterion matrix](../extensions/finite-trace/VERIFICATION.md).

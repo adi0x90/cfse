@@ -1,0 +1,162 @@
+[
+  {
+    "id": "C-DEMO-USER",
+    "name": "User",
+    "promise": "Synthetic user for finite observation checks.",
+    "attributes": [
+      {
+        "name": "id",
+        "type": "string"
+      }
+    ],
+    "entry_points": [
+      "EP-DEMO-USER"
+    ],
+    "invariants": []
+  },
+  {
+    "id": "EP-DEMO-USER",
+    "title": "Synthetic user",
+    "owner_concept": "C-DEMO-USER",
+    "method": "GET",
+    "path": "/user",
+    "action": "READ"
+  },
+  {
+    "id": "C-DEMO-PROJECT",
+    "name": "Project",
+    "promise": "Synthetic project for finite observation checks.",
+    "attributes": [
+      {
+        "name": "id",
+        "type": "string"
+      }
+    ],
+    "entry_points": [
+      "EP-DEMO-PROJECT"
+    ],
+    "invariants": []
+  },
+  {
+    "id": "EP-DEMO-PROJECT",
+    "title": "Synthetic project",
+    "owner_concept": "C-DEMO-PROJECT",
+    "method": "GET",
+    "path": "/project",
+    "action": "READ"
+  },
+  {
+    "id": "C-DEMO-JOB",
+    "name": "ExportJob",
+    "promise": "Synthetic job for finite observation checks.",
+    "attributes": [
+      {
+        "name": "id",
+        "type": "string"
+      }
+    ],
+    "entry_points": [
+      "EP-DEMO-JOB"
+    ],
+    "invariants": []
+  },
+  {
+    "id": "EP-DEMO-JOB",
+    "title": "Synthetic job",
+    "owner_concept": "C-DEMO-JOB",
+    "method": "GET",
+    "path": "/job",
+    "action": "READ"
+  },
+  {
+    "id": "P-DEMO-ROLE",
+    "name": "Role",
+    "parameters": [
+      {
+        "name": "user",
+        "type": "C-DEMO-USER"
+      },
+      {
+        "name": "project",
+        "type": "C-DEMO-PROJECT"
+      }
+    ],
+    "returns": "boolean",
+    "definition": "True exactly when the user has the export role for this project at this observation point."
+  },
+  {
+    "id": "P-DEMO-AVAILABLE",
+    "name": "Available",
+    "parameters": [
+      {
+        "name": "job",
+        "type": "C-DEMO-JOB"
+      }
+    ],
+    "returns": "boolean",
+    "definition": "True exactly when the export artifact for this job is available at this observation point. Confirmed absence means false."
+  },
+  {
+    "id": "P-DEMO-REQUESTED",
+    "name": "Requested",
+    "parameters": [
+      {
+        "name": "user",
+        "type": "C-DEMO-USER"
+      },
+      {
+        "name": "project",
+        "type": "C-DEMO-PROJECT"
+      }
+    ],
+    "returns": "boolean",
+    "definition": "True exactly when the observed request decision allows this user to request an export for this project."
+  },
+  {
+    "id": "P-DEMO-DELIVERED",
+    "name": "Delivered",
+    "parameters": [
+      {
+        "name": "user",
+        "type": "C-DEMO-USER"
+      },
+      {
+        "name": "project",
+        "type": "C-DEMO-PROJECT"
+      },
+      {
+        "name": "job",
+        "type": "C-DEMO-JOB"
+      }
+    ],
+    "returns": "boolean",
+    "definition": "True exactly when the observed delivery decision allows this user to receive this job in this project."
+  },
+  {
+    "id": "INV-DEMO-REQUEST",
+    "rule": "The observed request decision must equal the declared synthetic policy decision.",
+    "logic": "FORALL u: C-DEMO-USER. FORALL p: C-DEMO-PROJECT. P-DEMO-REQUESTED(u, p) IFF P-DEMO-ROLE(u, p)",
+    "predicates": [
+      "P-DEMO-REQUESTED",
+      "P-DEMO-ROLE"
+    ],
+    "criticality": "P1",
+    "tags": [
+      "authz"
+    ]
+  },
+  {
+    "id": "INV-DEMO-DELIVERY",
+    "rule": "The observed delivery decision must equal the declared synthetic policy decision.",
+    "logic": "FORALL u: C-DEMO-USER. FORALL p: C-DEMO-PROJECT. FORALL j: C-DEMO-JOB. P-DEMO-DELIVERED(u, p, j) IFF (P-DEMO-ROLE(u, p) AND P-DEMO-AVAILABLE(j))",
+    "predicates": [
+      "P-DEMO-DELIVERED",
+      "P-DEMO-ROLE",
+      "P-DEMO-AVAILABLE"
+    ],
+    "criticality": "P1",
+    "tags": [
+      "authz"
+    ]
+  }
+]

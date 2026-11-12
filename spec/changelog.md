@@ -10,7 +10,11 @@ This changelog starts at **1.0.0**, the first public release.
 
 ### Added
 
+- Informative opt-in finite-trace reference tooling and synthetic tests for typed predicate reuse, evidence uncertainty and reward eligibility. This is not a core evaluator or a change to Boolean Predicate schemas.
+
 ### Changed
+
+- Correct residual TR-1/TR-3 summary/pseudocode paths and the TR-5 FindingReference example to match existing schemas. No schema or cardinality change.
 
 ### Removed
 

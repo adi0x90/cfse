@@ -1,0 +1,14 @@
+[
+  {"name":"benign","outcome":"HOLDS","reward":1,"passed":true},
+  {"name":"denied_unknown","facts":{"P-DEMO-AVAILABLE":{"state":"unknown","value":null},"P-DEMO-DELIVERED":{"value":false}},"outcome":"UNKNOWN","reward":0,"passed":false},
+  {"name":"allowed_unknown","facts":{"P-DEMO-AVAILABLE":{"state":"unknown","value":null}},"outcome":"UNKNOWN","reward":0,"passed":false},
+  {"name":"independent_violation","facts":{"P-DEMO-AVAILABLE":{"state":"unknown","value":null},"P-DEMO-REQUESTED":{"value":false}},"outcome":"VIOLATED","reward":0,"passed":false},
+  {"name":"known_absent","facts":{"P-DEMO-AVAILABLE":{"state":"absent","value":false},"P-DEMO-DELIVERED":{"value":false}},"outcome":"HOLDS","reward":1,"passed":true},
+  {"name":"invalid_trace","facts":{"P-DEMO-DELIVERED":{"value":"false"}},"outcome":"INVALID_TRACE","reward":0,"passed":false},
+  {"name":"adapter_runtime_error","facts":{"P-DEMO-AVAILABLE":{"state":"runtime_error","value":null}},"outcome":"RUNTIME_ERROR","reward":0,"passed":false},
+  {"name":"adapter_timeout","facts":{"P-DEMO-AVAILABLE":{"state":"timeout","value":null}},"outcome":"TIMEOUT","reward":0,"passed":false},
+  {"name":"execution_budget","max_operations":1,"outcome":"TIMEOUT","reward":0,"passed":false},
+  {"name":"no_grader","remove_binding":"P-DEMO-AVAILABLE","outcome":"NO_GRADER","reward":0,"passed":false},
+  {"name":"parse_error","logic":"(true AND false","outcome":"PARSE_ERROR","reward":0,"passed":false},
+  {"name":"unsupported_temporal","logic":"ALWAYS (true AND true)","outcome":"STATIC_ERROR","reward":0,"passed":false}
+]

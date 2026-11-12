@@ -1,0 +1,76 @@
+{
+  "profile": "cfse-finite-trace/1",
+  "scope": "synthetic-export-window-1",
+  "policy_version": "1.0.0",
+  "bindings": {
+    "P-DEMO-ROLE": {
+      "version": "1.0.0",
+      "adapter": "boolean-table/1",
+      "parameters": [
+        {
+          "name": "user",
+          "type": "C-DEMO-USER"
+        },
+        {
+          "name": "project",
+          "type": "C-DEMO-PROJECT"
+        }
+      ],
+      "predicate_digest": "b4afb0e4009397fec48a0e3e84cf31280138a01886b1ce7828c17718f23c0b3a",
+      "review": "Synthetic correspondence: the named table cell records exactly the Boolean condition stated by this predicate. See README correspondence table.",
+      "absent_is_false": false
+    },
+    "P-DEMO-AVAILABLE": {
+      "version": "1.0.0",
+      "adapter": "boolean-table/1",
+      "parameters": [
+        {
+          "name": "job",
+          "type": "C-DEMO-JOB"
+        }
+      ],
+      "predicate_digest": "665b25cd2f6a5ba721238ee05517a59e282e6be875162209cd5d20b8e219d24f",
+      "review": "Synthetic correspondence: the named table cell records exactly the Boolean condition stated by this predicate. See README correspondence table.",
+      "absent_is_false": true
+    },
+    "P-DEMO-REQUESTED": {
+      "version": "1.0.0",
+      "adapter": "boolean-table/1",
+      "parameters": [
+        {
+          "name": "user",
+          "type": "C-DEMO-USER"
+        },
+        {
+          "name": "project",
+          "type": "C-DEMO-PROJECT"
+        }
+      ],
+      "predicate_digest": "d1f4493a0f62b99afea84a4409c284398c0883294ac3efd1dde6716a196a36a5",
+      "review": "Synthetic correspondence: the named table cell records exactly the Boolean condition stated by this predicate. See README correspondence table.",
+      "absent_is_false": false
+    },
+    "P-DEMO-DELIVERED": {
+      "version": "1.0.0",
+      "adapter": "boolean-table/1",
+      "parameters": [
+        {
+          "name": "user",
+          "type": "C-DEMO-USER"
+        },
+        {
+          "name": "project",
+          "type": "C-DEMO-PROJECT"
+        },
+        {
+          "name": "job",
+          "type": "C-DEMO-JOB"
+        }
+      ],
+      "predicate_digest": "197a1f62f9152a12607edb3df3609ec9973e3dd36c7c5ae321ecda93479ed892",
+      "review": "Synthetic correspondence: the named table cell records exactly the Boolean condition stated by this predicate. See README correspondence table.",
+      "absent_is_false": false
+    }
+  },
+  "max_operations": 10000
+}

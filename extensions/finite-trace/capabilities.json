@@ -1,0 +1,58 @@
+{
+  "profile": "cfse-finite-trace/1",
+  "status": "informative opt-in reference implementation; unreleased",
+  "core_version": "2.0.1",
+  "core_revision": "34575b9191c6a457faf669e505abac9af2e6dd2a",
+  "schema_digest": "924ba4ee43d6b0e52279b1447ba45e83d3318d666b30d14af5288d45a22a77ca",
+  "schema": [
+    "Concept",
+    "Predicate",
+    "Invariant",
+    "EntryPoint"
+  ],
+  "static_logic": {
+    "operators": [
+      "NOT",
+      "AND",
+      "OR",
+      "IMPLIES",
+      "IFF"
+    ],
+    "quantifiers": [
+      "FORALL",
+      "EXISTS"
+    ],
+    "domains": "finite Concept instances",
+    "arguments": "positional or named Concept variables",
+    "dependencies": "acyclic invariant assumptions"
+  },
+  "finite_execution": "all supplied observation points; explicit domain and trace completeness",
+  "bindings": [
+    "boolean-table/1"
+  ],
+  "not_checked": [
+    "authenticity",
+    "proof",
+    "policy_correspondence",
+    "full_core_conformance",
+    "source_binary_correspondence"
+  ],
+  "unsupported": [
+    "temporal operators",
+    "action terms",
+    "primitive domains and parameters",
+    "property access",
+    "literal arguments",
+    "executable implementations",
+    "artifact extension payloads"
+  ],
+  "limits": {
+    "combined_input_bytes": 1000000,
+    "artifacts": 128,
+    "tokens_per_formula": 512,
+    "nesting": 48,
+    "members_per_domain": 128,
+    "steps": 256,
+    "max_operations": 100000
+  }
+}
