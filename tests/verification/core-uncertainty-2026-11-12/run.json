@@ -1,0 +1,115 @@
+{
+  "date": "2026-11-12",
+  "base_revision": "e00bb89edab81c489dd80b16999766784cd25b8f",
+  "status": "Verified working-tree contents before local commit; no push or release.",
+  "interpreters": [
+    "Python 3.12.13",
+    "Python 3.15.2"
+  ],
+  "tests_each": {
+    "run": 41,
+    "passed": 40,
+    "skipped": 1,
+    "failed": 0
+  },
+  "skipped": "Pre-existing optional full-core external semantic validator; CFSE_CONTRACT_BINARY not supplied.",
+  "portable_evidence_vectors": 59,
+  "canonical_corpus_cases": 43,
+  "broken_evaluator_controls_rejected": 4,
+  "command_note": "Run from repository root. CFSE_VERIFY_ENV is the temporary Python 3.12 environment installed from tests/requirements.txt.",
+  "checks": [
+    {
+      "name": "python312-suite",
+      "command": [
+        "$CFSE_VERIFY_ENV/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "output": "python312-suite.txt",
+      "sha256": "c6d8014f54e44b24b9956fd14facb707748920a8b0eb13d46c2d8438fa74cf3c"
+    },
+    {
+      "name": "python315-suite",
+      "command": [
+        ".venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "output": "python315-suite.txt",
+      "sha256": "89a58dc673dbe1da2aadee284c96d4d228ab45b07d5e6679ff2b558ceb7972bc"
+    },
+    {
+      "name": "cli-smoke",
+      "command": [
+        ".venv/bin/python",
+        "-B",
+        "extensions/finite-trace/evaluate.py",
+        "--artifacts",
+        "extensions/finite-trace/fixtures/artifacts.json",
+        "--config",
+        "extensions/finite-trace/fixtures/bindings.json",
+        "--trace",
+        "extensions/finite-trace/fixtures/trace.json"
+      ],
+      "exit_code": 0,
+      "output": "cli-smoke.txt",
+      "sha256": "d9e341bdb0ade11d86520809b0eb54abc0a3f2a22ef6005bf60d917f2dab8b21"
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output": "diff-check.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "schema-compatibility",
+      "command": [
+        "git",
+        "diff",
+        "e00bb89",
+        "--",
+        "spec/**/*.schema.yaml",
+        "VERSION"
+      ],
+      "exit_code": 0,
+      "output": "schema-compatibility.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "source_sha256": {
+    "ARCHITECTURE.yml": "00d725b90c933f828474791b6793f06c2376be39ec6ad3c9fb8691d6e3b06fd4",
+    "extensions/finite-trace/README.md": "07d299b6920090fd87e225a01392623ffa45746ce1b9a12a9e28504ade0e5d3f",
+    "extensions/finite-trace/capabilities.json": "01297fd95d841d545bd90e4b2442c41d406080ebabd4f42bdcf6d66e367fc852",
+    "extensions/finite-trace/evaluate.py": "4bfd4dd26cae2fc940259bfcaeecb80e19c939b31fa69eb321d247d01d3a308c",
+    "spec/README.md": "e83eef37522442964cb7d200073bcc7698277fd8dc652e843442bddc7830788d",
+    "spec/artifacts/supporting/predicate/predicate.md": "b740fa6cdceb293473c09be2ddd24471ab6fca9abaea47e80c36f5ace84aebc4",
+    "spec/changelog.md": "9a5a2a27ad4e1d7731600c3d6114388104481795cd9b49dcd1bda60dbda73de8",
+    "spec/foundations/conformance.md": "5bdedc1771cc9c51ab8350b82ac1efa3a1d9e3502f30b0c86201dafe785193f6",
+    "spec/grammar/03-formal-logic.md": "d4845848fa68f8a587e5e4e9949c24ef9344eb177a32abf5c17b9f4ab0a37749",
+    "spec/semantics/01-invariant-states.md": "16192fd79547356b3160daccf8632a487a3aa79396024e5870ea797e06d2cfdc",
+    "spec/semantics/02-exploration-verdicts.md": "c9f3eee5c26f0631994bf34de85565a6805bb4db34a2e710c8498c1c4a8668f8",
+    "tests/README.md": "86791177065bd0dc4e3cfdcf12096597e91e919fd51eabfd5bc376203bdbb3fa",
+    "tests/fixtures/contract/cases.json": "e27552f5b970c6ddee6ac5192fc3b2184b76482a69e9acb06499b81c917abe84",
+    "spec/semantics/06-evidence-evaluation.md": "22e5a077ddf4d0b96dbe66e59419639136fd45c5d2650b98896a492fcd7dd0dd",
+    "guides/migrations/evidence-evaluation.md": "ca767f102d0f26dc65b56035629648b1ee17756595fdd9abee8a70699edc2235",
+    "tests/test_core_uncertainty.py": "26299a224d1ad7e0424a3207df16037969b083daa2d59e7c815c31a854349a3f",
+    "tests/fixtures/uncertainty/cases.json": "862752002938198a5a0514db3635fbc2a529ad0f466956c82b5ea016d6150b21"
+  }
+}

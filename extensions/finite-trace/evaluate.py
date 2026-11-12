@@ -201,6 +201,7 @@ def schema_digest():
 def identity(corpus, config, trace):
     return {'profile': PROFILE, 'core_revision': CORE_REVISION, 'schemas': schema_digest(),
             'engine': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            'evidence_contract': hashlib.sha256((ROOT / 'spec/semantics/06-evidence-evaluation.md').read_bytes()).hexdigest(),
             'artifacts': digest(corpus), 'configuration': digest(config), 'trace': digest(trace)}
 
 
@@ -380,14 +381,17 @@ def decision(evidence):
     outcome = ('TIMEOUT' if 'TIMEOUT' in evidence.failures else 'RUNTIME_ERROR') if evidence.failures else state
     passed = state == 'HOLDS' and not evidence.failures
     return dict(state=state, outcome=outcome, reward=int(passed), passed=passed,
+                truth={True: 'TRUE', False: 'FALSE', None: 'UNKNOWN'}[evidence.value],
+                result_scope='finite_formula', exploration_state='not_checked',
                 reasons=list(evidence.reasons), observations=list(evidence.observations), failures=list(evidence.failures))
 
 
 def evaluate(corpus, config, trace):
     capabilities = dict(schema='not_checked', static_logic='not_checked', finite_execution='not_checked',
                         authenticity='not_checked', proof='not_checked', policy_correspondence='not_checked',
-                        full_core_conformance='not_checked')
-    report = dict(profile=PROFILE, capabilities=capabilities, diagnostics=[], invariants={})
+                        full_core_conformance='not_checked', exploration_verdict='not_checked')
+    report = dict(profile=PROFILE, capabilities=capabilities, diagnostics=[], invariants={},
+                  truth='UNKNOWN', result_scope='finite_formula', exploration_state='not_checked')
     try:
         require(len(json.dumps([corpus, config, trace], allow_nan=False).encode()) <= MAX_BYTES,
                 'LIMIT', 'combined input exceeds 1 MB')
@@ -465,6 +469,7 @@ def main():
         result = evaluate(load_json(args.artifacts), load_json(args.config), load_json(args.trace))
     except (OSError, ValueError, Diagnostic, RecursionError) as exc:
         result = dict(state='UNKNOWN', outcome='INVALID_INPUT', reward=0, passed=False,
+                      truth='UNKNOWN', result_scope='finite_formula', exploration_state='not_checked',
                       diagnostics=[dict(code='INVALID_INPUT', path='$', message=str(exc))])
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result['passed'] else 1

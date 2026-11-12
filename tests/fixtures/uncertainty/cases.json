@@ -1,0 +1,266 @@
+{
+  "description": "Implementation-independent CFSE core evidence vectors. T/F/U describe knowledge of a Boolean proposition, not Predicate return types. No additional reasoning or evidence is supplied.",
+  "binary": [
+    {
+      "a": "T",
+      "b": "T",
+      "AND": "T",
+      "OR": "T",
+      "IMPLIES": "T",
+      "IFF": "T"
+    },
+    {
+      "a": "T",
+      "b": "F",
+      "AND": "F",
+      "OR": "T",
+      "IMPLIES": "F",
+      "IFF": "F"
+    },
+    {
+      "a": "T",
+      "b": "U",
+      "AND": "U",
+      "OR": "T",
+      "IMPLIES": "U",
+      "IFF": "U"
+    },
+    {
+      "a": "F",
+      "b": "T",
+      "AND": "F",
+      "OR": "T",
+      "IMPLIES": "T",
+      "IFF": "F"
+    },
+    {
+      "a": "F",
+      "b": "F",
+      "AND": "F",
+      "OR": "F",
+      "IMPLIES": "T",
+      "IFF": "T"
+    },
+    {
+      "a": "F",
+      "b": "U",
+      "AND": "F",
+      "OR": "U",
+      "IMPLIES": "T",
+      "IFF": "U"
+    },
+    {
+      "a": "U",
+      "b": "T",
+      "AND": "U",
+      "OR": "T",
+      "IMPLIES": "T",
+      "IFF": "U"
+    },
+    {
+      "a": "U",
+      "b": "F",
+      "AND": "F",
+      "OR": "U",
+      "IMPLIES": "U",
+      "IFF": "U"
+    },
+    {
+      "a": "U",
+      "b": "U",
+      "AND": "U",
+      "OR": "U",
+      "IMPLIES": "U",
+      "IFF": "U"
+    }
+  ],
+  "unary": [
+    {
+      "a": "T",
+      "NOT": "F"
+    },
+    {
+      "a": "F",
+      "NOT": "T"
+    },
+    {
+      "a": "U",
+      "NOT": "U"
+    }
+  ],
+  "formulas": [
+    {
+      "name": "denied_unknown",
+      "logic": "false IFF B",
+      "a": "T",
+      "b": "U",
+      "expected": "U",
+      "eligible": false
+    },
+    {
+      "name": "allowed_unknown",
+      "logic": "true IFF B",
+      "a": "T",
+      "b": "U",
+      "expected": "U",
+      "eligible": false
+    },
+    {
+      "name": "violation_after_missing",
+      "logic": "B AND false",
+      "a": "T",
+      "b": "U",
+      "expected": "F",
+      "eligible": false
+    },
+    {
+      "name": "violation_before_missing",
+      "logic": "false AND B",
+      "a": "T",
+      "b": "U",
+      "expected": "F",
+      "eligible": false
+    },
+    {
+      "name": "sufficient_disjunction",
+      "logic": "true OR B",
+      "a": "T",
+      "b": "U",
+      "expected": "T",
+      "eligible": true
+    },
+    {
+      "name": "absence_is_observed",
+      "logic": "false IFF B",
+      "a": "T",
+      "b": "F",
+      "expected": "T",
+      "eligible": true
+    },
+    {
+      "name": "missing_is_not_absence",
+      "logic": "false IFF B",
+      "a": "T",
+      "b": "U",
+      "omit_b": true,
+      "expected": "U",
+      "eligible": false
+    },
+    {
+      "name": "known_and_value_is_different_proposition",
+      "logic": "A AND B",
+      "a": "F",
+      "b": "U",
+      "expected": "F",
+      "eligible": false
+    },
+    {
+      "name": "unknown_value_itself",
+      "logic": "B",
+      "a": "F",
+      "b": "U",
+      "expected": "U",
+      "eligible": false
+    },
+    {
+      "name": "knowability_guard_vacuity",
+      "logic": "A IMPLIES B",
+      "a": "F",
+      "b": "U",
+      "expected": "T",
+      "eligible": true
+    },
+    {
+      "name": "runtime_failure_not_success",
+      "logic": "true OR B",
+      "a": "T",
+      "b": "U",
+      "failure": "runtime_error",
+      "expected": "T",
+      "eligible": false
+    },
+    {
+      "name": "timeout_not_success",
+      "logic": "true OR B",
+      "a": "T",
+      "b": "U",
+      "failure": "timeout",
+      "expected": "T",
+      "eligible": false
+    }
+  ],
+  "domains": [
+    {
+      "name": "universal_incomplete_positive",
+      "operator": "FORALL",
+      "complete": false,
+      "members": [
+        "job-1"
+      ],
+      "value": "T",
+      "expected": "U"
+    },
+    {
+      "name": "universal_counterexample",
+      "operator": "FORALL",
+      "complete": false,
+      "members": [
+        "job-1"
+      ],
+      "value": "F",
+      "expected": "F"
+    },
+    {
+      "name": "existential_incomplete_negative",
+      "operator": "EXISTS",
+      "complete": false,
+      "members": [
+        "job-1"
+      ],
+      "value": "F",
+      "expected": "U"
+    },
+    {
+      "name": "existential_witness",
+      "operator": "EXISTS",
+      "complete": false,
+      "members": [
+        "job-1"
+      ],
+      "value": "T",
+      "expected": "T"
+    },
+    {
+      "name": "complete_empty_universal",
+      "operator": "FORALL",
+      "complete": true,
+      "members": [],
+      "value": "U",
+      "expected": "T"
+    },
+    {
+      "name": "complete_empty_existential",
+      "operator": "EXISTS",
+      "complete": true,
+      "members": [],
+      "value": "U",
+      "expected": "F"
+    },
+    {
+      "name": "incomplete_empty_universal",
+      "operator": "FORALL",
+      "complete": false,
+      "members": [],
+      "value": "U",
+      "expected": "U"
+    },
+    {
+      "name": "incomplete_empty_existential",
+      "operator": "EXISTS",
+      "complete": false,
+      "members": [],
+      "value": "U",
+      "expected": "U"
+    }
+  ]
+}

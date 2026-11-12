@@ -1,5 +1,7 @@
 # Exploration Verdicts Specification
 
+Verdict assignment MUST preserve uncertainty and independently supported findings under [Evidence Evaluation](06-evidence-evaluation.md). A finite formula result or unavailable evaluator alone does not establish a confirmed verdict.
+
 ## Overview
 
 An exploration is a concrete security experiment that executes a Baseline (BASE) path and an Attack (ATT) path, then interprets the observed delta.
@@ -114,7 +116,7 @@ An unexecuted `DRAFT` or `PLANNED` exploration MAY omit `verdict` with `observat
 
 When deciding a verdict from invariant observations:
 
-- If ANY targeted invariant is observed as `VIOLATED`, prefer `VIOLATION_CONFIRMED`.
+- If a targeted invariant is supported as `VIOLATED` and all confirmed-violation requirements are met, use `VIOLATION_CONFIRMED`. An unrelated UNKNOWN target MUST NOT erase that supported violation.
 - Else if EVERY targeted invariant is observed as `HOLDS` and the delta matches expectations, prefer `ENFORCEMENT_CONFIRMED`.
 - Else prefer `INCONCLUSIVE`.
 

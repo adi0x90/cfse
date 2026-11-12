@@ -34,6 +34,10 @@ This specification uses RFC-style keywords (RFC 2119 + RFC 8174) when, and only 
 | SHOULD NOT | Discouraged unless good reason to deviate |
 | MAY | Truly optional |
 
+## Unreleased core requirements
+
+The working specification includes new normative [Evidence Evaluation](semantics/06-evidence-evaluation.md) guarantees. They are not part of the published 2.0.1 release. See the [migration note](../guides/migrations/evidence-evaluation.md); schema compatibility does not imply unchanged evaluator conformance.
+
 ## Conformance
 
 See [foundations/conformance.md](foundations/conformance.md) for conformance levels.

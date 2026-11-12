@@ -1,5 +1,7 @@
 # Invariant States Specification
 
+The core [Evidence Evaluation](06-evidence-evaluation.md) requirements govern uncertainty, operational failures, and evidence composition. A Boolean formula result alone is not one of the execution-backed states defined here.
+
 ## Overview
 
 During explorations, invariants are evaluated against system behavior to determine whether security properties hold. This specification defines the four possible invariant states and their interpretation rules.
@@ -105,7 +107,7 @@ When an invariant is marked UNKNOWN:
 
 ### Usage Criteria
 
-An invariant SHOULD be marked UNKNOWN when ANY of the following conditions are met:
+An invariant MUST be marked UNKNOWN when its evaluation was attempted but the available evidence cannot establish enforcement or violation under the requirements above. The following conditions require UNKNOWN when they prevent that determination; an unrelated gap MUST NOT erase an independently supported result:
 
 - System returned unexpected error unrelated to authorization (e.g., 500, timeout)
 - Baseline path itself failed, preventing delta comparison

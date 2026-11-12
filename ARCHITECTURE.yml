@@ -165,6 +165,7 @@ cfse:
             - 03-artifact-lifecycle.md
             - 04-traceability.md
             - 05-delta-interpretation.md
+            - 06-evidence-evaluation.md
 
         root_files:
           - spec/README.md

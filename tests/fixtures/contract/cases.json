@@ -2586,6 +2586,164 @@
           "approved": "2026-11-09"
         }
       }
+    },
+    {
+      "name": "violation_with_independent_unknown",
+      "schema_valid": true,
+      "valid": true,
+      "replace": {
+        "exploration": {
+          "id": "E-TEST-OWNER-001-01",
+          "title": "Owner deletion experiment",
+          "scenario_ref": "S-TEST-OWNER-001",
+          "objective": "Determine whether non-owner deletion violates INV-TEST-OWNER.",
+          "base_setup": {
+            "description": "Owner and a fresh item.",
+            "actor": "owner"
+          },
+          "base_action": {
+            "steps": [
+              {
+                "order": 1,
+                "description": "Owner deletes a fresh item.",
+                "command": "harness delete --actor owner"
+              }
+            ]
+          },
+          "base_expected": {
+            "outcome": "Owner deletion succeeds."
+          },
+          "att_setup": {
+            "description": "Non-owner and equivalent fresh item.",
+            "actor": "non-owner"
+          },
+          "att_action": {
+            "steps": [
+              {
+                "order": 1,
+                "description": "Non-owner attempts deletion.",
+                "command": "harness delete --actor non-owner"
+              }
+            ]
+          },
+          "att_expected": {
+            "outcome": "Non-owner deletion is rejected."
+          },
+          "observations": {
+            "executed_at": "2026-11-09T10:00:00Z",
+            "environment": "isolated fixture harness",
+            "base_results": {
+              "success": true,
+              "status_code": 200,
+              "state_after": {
+                "item_exists": false
+              }
+            },
+            "att_results": {
+              "success": true,
+              "status_code": 200,
+              "state_after": {
+                "item_exists": false
+              }
+            },
+            "delta": {
+              "summary": "Compared the resulting item state.",
+              "invariant_states": [
+                {
+                  "invariant": "INV-TEST-AUDIT",
+                  "state": "UNKNOWN",
+                  "evidence": "Synthetic independent audit observation unavailable; ownership violation remains established."
+                },
+                {
+                  "invariant": "INV-TEST-OWNER",
+                  "state": "VIOLATED",
+                  "evidence": "Owner readback and database query confirm resulting item state."
+                }
+              ]
+            }
+          },
+          "status": "DRAFT",
+          "verdict": {
+            "result": "VIOLATION_CONFIRMED",
+            "summary": "The targeted ownership property was evaluated from item state."
+          }
+        },
+        "scenario": {
+          "id": "S-TEST-OWNER-001",
+          "title": "Non-owner deletion",
+          "hypothesis": "A non-owner may delete an item, violating INV-TEST-OWNER.",
+          "targeted_invariants": [
+            "INV-TEST-OWNER",
+            "INV-TEST-AUDIT"
+          ],
+          "attack_vector": {
+            "anchor": {
+              "type": "entry_point",
+              "ref": "EP-TEST-ITEM"
+            },
+            "manipulation": {
+              "type": "mutate_param",
+              "details": "Replace the owner session with the other user session."
+            }
+          },
+          "expected_outcome": {
+            "if_vulnerable": "Item is deleted by a non-owner.",
+            "if_secure": "Item remains present and access is denied."
+          }
+        }
+      },
+      "add": {
+        "finding": {
+          "id": "FD-TEST-AUTHZ-001",
+          "title": "Non-owner can delete item",
+          "severity": "HIGH",
+          "description": "The non-owner deleted the protected item in the matched local experiment.",
+          "evidence": [
+            {
+              "type": "exploration",
+              "description": "Matched execution demonstrates deletion by non-owner.",
+              "reference": "E-TEST-OWNER-001-01"
+            }
+          ],
+          "violated_invariants": [
+            {
+              "invariant": "INV-TEST-OWNER",
+              "violation_details": "Item deleted by non-owner."
+            }
+          ],
+          "remediation": {
+            "summary": "Check ownership before committing deletion."
+          },
+          "traceability": {
+            "exploration": "E-TEST-OWNER-001-01",
+            "scenario": "S-TEST-OWNER-001"
+          }
+        },
+        "audit_predicate": {
+          "id": "P-TEST-AUDIT",
+          "name": "Has audit record",
+          "parameters": [
+            {
+              "name": "user",
+              "type": "C-TEST-USER"
+            }
+          ],
+          "returns": "boolean",
+          "definition": "True if this user has the required independent audit record."
+        },
+        "audit_invariant": {
+          "id": "INV-TEST-AUDIT",
+          "rule": "Every tested user has the required independent audit record.",
+          "logic": "FORALL user: C-TEST-USER. P-TEST-AUDIT(user)",
+          "predicates": [
+            "P-TEST-AUDIT"
+          ],
+          "criticality": "P2",
+          "tags": [
+            "integrity"
+          ]
+        }
+      }
     }
   ]
 }

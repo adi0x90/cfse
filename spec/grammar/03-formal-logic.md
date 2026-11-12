@@ -1,5 +1,7 @@
 # Formal Logic Specification
 
+When these operators are evaluated from incomplete observations, implementations MUST follow the core [Evidence Evaluation](../semantics/06-evidence-evaluation.md) contract. Its evidence tables preserve the Boolean logic below while distinguishing unresolved evidence from falsehood.
+
 ## Overview
 
 CFSE uses a formal logic notation to express security invariants - properties that must always hold for a system to be considered secure. This specification defines:

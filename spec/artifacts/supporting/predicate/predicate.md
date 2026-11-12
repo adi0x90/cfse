@@ -82,7 +82,11 @@ Always `"boolean"`. This field exists for:
 - Tooling support
 - Type system integration
 
-Predicates must evaluate to exactly true or false. If you need a predicate that could be "unknown," model it as `P-X-KNOWN AND P-X-VALUE` where the first predicate checks knowability.
+The proposition denoted by a Predicate is Boolean. Insufficient evidence to evaluate it MUST remain unresolved; it MUST NOT be converted to false. The core [Evidence Evaluation](../../../semantics/06-evidence-evaluation.md) requirements distinguish Boolean truth, available evidence, and evaluation/admission outcomes.
+
+An explicit `P-X-KNOWN` predicate MAY express knowability under a stated observation contract. `P-X-KNOWN AND P-X-VALUE` expresses a different proposition: **X is known and true**. If KNOWN is false and VALUE is unobserved, the conjunction is false, but VALUE remains unknown. That conjunction MUST NOT be used as a generic encoding that turns missing VALUE evidence into falsehood.
+
+Similarly, `P-X-KNOWN IMPLIES P-X-VALUE` can be vacuously true when X is not known; it does not establish X or a core `HOLDS` result. An explicit policy requiring knowability is valid, but its failure is a failure of that policy obligation, not evidence that X itself is false. Preserve unresolved evidence separately without changing `returns: boolean`.
 
 ---
 

@@ -10,9 +10,15 @@ This changelog starts at **1.0.0**, the first public release.
 
 ### Added
 
+- **Normative core:** Evidence Evaluation requirements distinguish Boolean propositions, insufficient evidence, operational failures and successful claims; define partial-evidence composition and finite-domain completeness; retain independent violations and existing BASE/ATT confirmation gates. Numeric reward scales and execution machinery remain implementation-specific.
+- Portable core uncertainty conformance vectors and tests, plus a mixed definite-violation/unknown-target corpus case.
+
 - Informative opt-in finite-trace reference tooling and synthetic tests for typed predicate reuse, evidence uncertainty and reward eligibility. This is not a core evaluator or a change to Boolean Predicate schemas.
 
 ### Changed
+
+- Replace the misleading `KNOWN AND VALUE` uncertainty recipe with explicit knowability versus value-evidence semantics. This tightens evaluator conformance without changing artifact schemas or Predicate return types; see the [migration note](../guides/migrations/evidence-evaluation.md) and major-version conformance-change policy in [RELEASING.md](../RELEASING.md). Not released as 2.0.1.
+- Optional finite-trace results now explicitly identify formula truth and unperformed Exploration evaluation, and bind the core evidence-contract digest.
 
 - Correct residual TR-1/TR-3 summary/pseudocode paths and the TR-5 FindingReference example to match existing schemas. No schema or cardinality change.
 

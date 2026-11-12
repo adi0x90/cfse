@@ -73,6 +73,12 @@ Validators SHOULD report schema, reference, lifecycle-record, logic, and evidenc
 
 Passing static evidence-record checks does not authenticate evidence, verify the experiment's execution, or prove a security property. Lifecycle-record checks establish required metadata, not actual approval or transition history. A complete conformance declaration still requires all applicable normative obligations, including those outside the validator's supported checks.
 
+### Evidence evaluation requirements
+
+The core [Evidence Evaluation](../semantics/06-evidence-evaluation.md) guarantees apply to every implementation or researcher making semantic evidence claims, including optional execution profiles. Implementations MUST preserve unresolved evidence, distinguish operational failures, retain independently justified conclusions, and gate successful claims as specified there. A schema-only implementation need not execute these checks, but MUST report evidence evaluation as `not_checked` and MUST NOT claim those requirements passed.
+
+A conformance report MUST distinguish formula evaluation from execution-backed invariant states and Exploration verdicts. Claiming full evidence correctness solely from a schema pass, missing-value default, failed evaluator, or vacuously true formula is non-conformant. Portable evidence vectors under `tests/fixtures/uncertainty/` test these obligations for supported operators; passing them alone is not full core conformance or authentication.
+
 ### Traceability Validation
 
 At Full conformance, all traceability rules (TR-1 through TR-5) MUST be satisfied.

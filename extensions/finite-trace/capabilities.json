@@ -35,7 +35,8 @@
     "proof",
     "policy_correspondence",
     "full_core_conformance",
-    "source_binary_correspondence"
+    "source_binary_correspondence",
+    "exploration_verdict"
   ],
   "unsupported": [
     "temporal operators",
@@ -54,5 +55,7 @@
     "members_per_domain": 128,
     "steps": 256,
     "max_operations": 100000
-  }
+  },
+  "core_evidence_contract": "spec/semantics/06-evidence-evaluation.md (unreleased normative core)",
+  "result_scope": "finite_formula"
 }
